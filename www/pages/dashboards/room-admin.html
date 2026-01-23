@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Room Admin Dashboard - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <link rel="stylesheet" href="../../css/room-admin.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Room Admin</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="room-admin.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../room-admin/rooms.html" class="nav-item">
+                    <span class="nav-icon">🏫</span>
+                    <span>Manage Rooms</span>
+                </a>
+                <a href="../room-admin/notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Welcome, <span id="adminName">Room Admin</span></h1>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🏫</div>
+                        <div class="stat-info">
+                            <h3 id="totalRooms">0</h3>
+                            <p>Total Rooms</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="availableRooms">0</h3>
+                            <p>Available Rooms</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🚧</div>
+                        <div class="stat-info">
+                            <h3 id="maintenanceRooms">0</h3>
+                            <p>Under Maintenance</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="currentUsageCount">0</h3>
+                            <p>Rooms in Use</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Usage Overview -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Current Room Usage</h2>
+                        <a href="../room-admin/rooms.html" class="link">Manage Rooms</a>
+                    </div>
+                    <div class="card-body" id="roomUsageList">
+                        <p class="no-data">Loading room usage...</p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Notifications</h2>
+                        <a href="../room-admin/notifications.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="notificationsList">
+                        <p class="no-data">No new notifications</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script>
+        requireRole('room_admin');
+
+        const user = getSessionUser();
+        if (user) {
+            document.getElementById('adminName').textContent = user.first_name;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', e => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) logout();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // TODO: Fetch room stats and current usage
+
+                document.getElementById('totalRooms').textContent = '0';
+                document.getElementById('availableRooms').textContent = '0';
+                document.getElementById('maintenanceRooms').textContent = '0';
+                document.getElementById('currentUsageCount').textContent = '0';
+
+                document.getElementById('roomUsageList').innerHTML = '<p class="no-data">No rooms currently in use.</p>';
+                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

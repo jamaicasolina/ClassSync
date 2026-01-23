@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ClassSync</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation (will be populated by JS) -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Profile Settings</h1>
+                <button class="btn btn-secondary" id="backBtn">← Back to Dashboard</button>
+            </header>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Personal Information</h2>
+                </div>
+                <div class="card-body">
+                    <form id="profileForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="middleName">Middle Name</label>
+                                <input type="text" id="middleName" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="surname">Surname</label>
+                                <input type="text" id="surname" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" disabled>
+                                <small class="help-text">Email cannot be changed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="studentId">Student ID</label>
+                                <input type="text" id="studentId" disabled>
+                                <small class="help-text">Student ID cannot be changed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="role">Role</label>
+                                <input type="text" id="role" disabled>
+                                <small class="help-text">Role cannot be changed</small>
+                            </div>
+                        </div>
+
+                        <!-- Student/Student Rep specific fields -->
+                        <div id="studentFields" class="hidden">
+                            <h3 class="mt-4 mb-3">Student Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="yearLevel">Year Level</label>
+                                    <select id="yearLevel">
+                                        <option value="">Select Year</option>
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3">3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="section">Section</label>
+                                    <input type="text" id="section" placeholder="e.g., 1, 2, 1P, 2P">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Student Rep specific field -->
+                        <div id="officerFields" class="hidden">
+                            <div class="form-group">
+                                <label for="officerRole">Officer Position</label>
+                                <select id="officerRole">
+                                    <option value="">Select Position</option>
+                                    <option value="president">President</option>
+                                    <option value="vice_president">Vice President</option>
+                                    <option value="secretary">Secretary</option>
+                                    <option value="treasurer">Treasurer</option>
+                                    <option value="auditor">Auditor</option>
+                                    <option value="pio">Public Information Officer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="message" class="hidden mt-3"></div>
+        </main>
+    </div>
+
+    <script src="../js/core/roles.js"></script>
+    <script>
+        // Check authentication
+        requireAuth();
+
+        const user = getSessionUser();
+        const API_URL = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers";
+
+        // Populate sidebar based on role
+        function populateSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const roleLinks = {
+                professor: [
+                    { href: 'dashboards/professor.html', icon: '📊', text: 'Dashboard' },
+                    { href: 'professor/courses.html', icon: '📚', text: 'Courses' },
+                    { href: 'professor/schedules.html', icon: '📅', text: 'Schedules' },
+                    { href: 'professor/attendance.html', icon: '✓', text: 'Attendance' },
+                    { href: 'professor/notifications.html', icon: '🔔', text: 'Notifications' }
+                ],
+                student: [
+                    { href: 'dashboards/student.html', icon: '📊', text: 'Dashboard' },
+                    { href: 'student/attendance.html', icon: '✓', text: 'Attendance' },
+                    { href: 'student/notifications.html', icon: '🔔', text: 'Notifications' },
+                    { href: 'student/rooms.html', icon: '🚪', text: 'Rooms' }
+                ],
+                student_rep: [
+                    { href: 'dashboards/studentrep.html', icon: '📊', text: 'Dashboard' },
+                    { href: 'student-rep/attendance-input.html', icon: '✏️', text: 'Input Attendance' },
+                    { href: 'student-rep/attendance.html', icon: '✓', text: 'My Attendance' },
+                    { href: 'student-rep/courses-sched.html', icon: '📚', text: 'Courses & Schedule' },
+                    { href: 'student-rep/notifications.html', icon: '🔔', text: 'Notifications' },
+                    { href: 'student-rep/rooms.html', icon: '🚪', text: 'Rooms' }
+                ],
+                room_admin: [
+                    { href: 'dashboards/room-admin.html', icon: '📊', text: 'Dashboard' },
+                    { href: 'room-admin/rooms.html', icon: '🚪', text: 'Manage Rooms' },
+                    { href: 'room-admin/notifications.html', icon: '🔔', text: 'Notifications' }
+                ],
+                chairperson: [
+                    { href: 'dashboards/chairperson.html', icon: '📊', text: 'Dashboard' },
+                    { href: 'chairperson/attendance-reports.html', icon: '📈', text: 'Attendance Reports' },
+                    { href: 'chairperson/schedule-changes.html', icon: '📅', text: 'Schedule Changes' },
+                    { href: 'chairperson/notifications.html', icon: '🔔', text: 'Notifications' }
+                ]
+            };
+
+            const links = roleLinks[user.role] || [];
+            
+            sidebar.innerHTML = `
+                <div class="sidebar-header">
+                    <h2>ClassSync</h2>
+                    <p class="user-role">${formatRole(user.role)}</p>
+                </div>
+                <nav class="sidebar-nav">
+                    ${links.map(link => `
+                        <a href="${link.href}" class="nav-item">
+                            <span class="nav-icon">${link.icon}</span>
+                            <span>${link.text}</span>
+                        </a>
+                    `).join('')}
+                    <a href="profile.html" class="nav-item active">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" id="logoutBtn">
+                        <span class="nav-icon">🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </nav>
+            `;
+
+            // Add logout handler
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm('Are you sure you want to logout?')) {
+                    logout();
+                }
+            });
+        }
+
+        // Load profile data
+        function loadProfileData() {
+            document.getElementById('firstName').value = user.first_name || '';
+            document.getElementById('middleName').value = user.middle_name || '';
+            document.getElementById('surname').value = user.surname || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('studentId').value = user.student_id || '';
+            document.getElementById('role').value = formatRole(user.role);
+
+            // Show student fields for students and student reps
+            if (user.role === 'student' || user.role === 'student_rep') {
+                document.getElementById('studentFields').classList.remove('hidden');
+                document.getElementById('yearLevel').value = user.year_level || '';
+                document.getElementById('section').value = user.section || '';
+
+                if (user.role === 'student_rep') {
+                    document.getElementById('officerFields').classList.remove('hidden');
+                    document.getElementById('officerRole').value = user.officer_role || '';
+                }
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                firstName: document.getElementById('firstName').value.trim(),
+                middleName: document.getElementById('middleName').value.trim(),
+                surname: document.getElementById('surname').value.trim()
+            };
+
+            // Add student-specific fields
+            if (user.role === 'student' || user.role === 'student_rep') {
+                payload.year = document.getElementById('yearLevel').value;
+                payload.section = document.getElementById('section').value.trim();
+
+                if (user.role === 'student_rep') {
+                    payload.officerRole = document.getElementById('officerRole').value;
+                }
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/AuthController.php?action=update_profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Update session with new data
+                    updateSessionUser(data.user);
+                    showMessage('Profile updated successfully!', 'success');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            } catch (err) {
+                console.error('Update error:', err);
+                showMessage('Failed to update profile', 'error');
+            }
+        });
+
+        // Back button
+        document.getElementById('backBtn').addEventListener('click', () => {
+            redirectToDashboard(user.role);
+        });
+
+        // Cancel button
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            if (confirm('Discard changes?')) {
+                loadProfileData();
+            }
+        });
+
+        // Show message
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Initialize
+        populateSidebar();
+        loadProfileData();
+    </script>
+</body>
+</html>
