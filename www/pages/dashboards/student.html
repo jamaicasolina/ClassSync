@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Dashboard - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <link rel="stylesheet" href="../../css/student.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Student</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="student.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../student/attendance.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    <span>My Attendance</span>
+                </a>
+                <a href="../student/notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </a>
+                <a href="../student/rooms.html" class="nav-item">
+                    <span class="nav-icon">🏫</span>
+                    <span>Room Availability</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Welcome, <span id="studentName">Student</span></h1>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <h3 id="totalCourses">0</h3>
+                            <p>Enrolled Courses</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="weekScheduleCount">0</h3>
+                            <p>This Week's Classes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✓</div>
+                        <div class="stat-info">
+                            <h3 id="attendancePercentage">0%</h3>
+                            <p>Attendance Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>This Week's Schedule</h2>
+                        <a href="../student/attendance.html" class="link">View Attendance</a>
+                    </div>
+                    <div class="card-body" id="weeklySchedule">
+                        <p class="no-data">Loading schedule...</p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Notifications</h2>
+                        <a href="../student/notifications.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="notificationsList">
+                        <p class="no-data">No new notifications</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script>
+        requireRole('student');
+
+        const user = getSessionUser();
+        if (user) {
+            document.getElementById('studentName').textContent = user.first_name;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', e => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) logout();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // TODO: Fetch enrolled courses count, weekly classes count, attendance %
+                document.getElementById('totalCourses').textContent = '0';
+                document.getElementById('weekScheduleCount').textContent = '0';
+                document.getElementById('attendancePercentage').textContent = '0%';
+
+                document.getElementById('weeklySchedule').innerHTML = '<p class="no-data">No classes scheduled this week.</p>';
+                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>
