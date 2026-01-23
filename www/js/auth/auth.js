@@ -1,453 +1,357 @@
-document.addEventListener('DOMContentLoaded', function() {
-    initializeStorage();
+// js/auth/auth.js
+const API_URL = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers";
+
+document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     checkExistingSession();
 });
 
-function initializeStorage() {
-    if (!localStorage.getItem('users')) {
-        localStorage.setItem('users', JSON.stringify([]));
-    }
-    
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    if (users.length === 0) {
-        const defaultUsers = [
-            {
-                id: generateId(),
-                firstName: 'John',
-                middleName: 'Michael',
-                surname: 'Smith',
-                email: 'professor@iskolarngbayan.pup.edu.ph',
-                secondaryEmail: 'professor@gmail.com',
-                studentId: '2020-00001-TN-0',
-                password: 'test123',
-                role: 'professor',
-                year: null,
-                section: null,
-                officerRole: null
-            },
-            {
-                id: generateId(),
-                firstName: 'Jane',
-                middleName: 'Marie',
-                surname: 'Doe',
-                email: 'student@iskolarngbayan.pup.edu.ph',
-                secondaryEmail: 'student@gmail.com',
-                studentId: '2021-12345-MN-0',
-                password: 'test123',
-                role: 'student',
-                year: '3',
-                section: '1',
-                officerRole: null
-            },
-            {
-                id: generateId(),
-                firstName: 'Bob',
-                middleName: 'James',
-                surname: 'Wilson',
-                email: 'rep@iskolarngbayan.pup.edu.ph',
-                secondaryEmail: 'rep@gmail.com',
-                studentId: '2022-23456-TN-1',
-                password: 'test123',
-                role: 'student_rep',
-                year: '2',
-                section: '2P',
-                officerRole: 'president'
-            },
-            {
-                id: generateId(),
-                firstName: 'Alice',
-                middleName: 'Rose',
-                surname: 'Johnson',
-                email: 'admin@iskolarngbayan.pup.edu.ph',
-                secondaryEmail: 'admin@gmail.com',
-                studentId: '2019-00002-AD-0',
-                password: 'test123',
-                role: 'room_admin',
-                year: null,
-                section: null,
-                officerRole: null
-            },
-            {
-                id: generateId(),
-                firstName: 'Sarah',
-                middleName: 'Grace',
-                surname: 'Lee',
-                email: 'chair@iskolarngbayan.pup.edu.ph',
-                secondaryEmail: 'chair@gmail.com',
-                studentId: '2018-00003-CH-0',
-                password: 'test123',
-                role: 'chairperson',
-                year: null,
-                section: null,
-                officerRole: null
-            }
-        ];
-        localStorage.setItem('users', JSON.stringify(defaultUsers));
-    }
-}
-
+/* -------------------------
+   EVENT LISTENERS
+--------------------------*/
 function setupEventListeners() {
-    document.getElementById('showSignup').addEventListener('click', function(e) {
+    document.getElementById('showSignup').onclick = e => {
         e.preventDefault();
         toggleForms('signup');
-    });
-    
-    document.getElementById('showLogin').addEventListener('click', function(e) {
+    };
+
+    document.getElementById('showLogin').onclick = e => {
         e.preventDefault();
         toggleForms('login');
-    });
-    
-    document.getElementById('signupRole').addEventListener('change', handleRoleChange);
-    
-    document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
-    document.getElementById('signupFormElement').addEventListener('submit', handleSignup);
-    
-    document.getElementById('signupEmail').addEventListener('blur', validatePrimaryEmail);
-    document.getElementById('signupSecondaryEmail').addEventListener('blur', validateSecondaryEmail);
-    document.getElementById('signupStudentId').addEventListener('input', formatStudentId);
-    document.getElementById('signupStudentId').addEventListener('blur', validateStudentId);
-    document.getElementById('signupSection').addEventListener('blur', validateSection);
+    };
+
+    document.getElementById('signupRole').onchange = handleRoleChange;
+    document.getElementById('loginFormElement').onsubmit = handleLogin;
+    document.getElementById('signupFormElement').onsubmit = handleSignup;
+
+    document.getElementById('signupEmail').onblur = validatePrimaryEmail;
+    document.getElementById('signupSecondaryEmail').onblur = validateSecondaryEmail;
+    document.getElementById('signupStudentId').oninput = formatStudentId;
+    document.getElementById('signupStudentId').onblur = validateStudentId;
+    document.getElementById('signupSection').onblur = validateSection;
 }
 
-function toggleForms(formType) {
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-    const message = document.getElementById('message');
-    
-    message.classList.add('hidden');
-    
-    if (formType === 'signup') {
-        loginForm.classList.add('hidden');
-        signupForm.classList.remove('hidden');
-    } else {
-        signupForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
-    }
+/* -------------------------
+   FORM TOGGLE
+--------------------------*/
+function toggleForms(type) {
+    document.getElementById('loginForm').classList.toggle('hidden', type === 'signup');
+    document.getElementById('signupForm').classList.toggle('hidden', type === 'login');
+    hideMessage();
 }
 
-function validatePrimaryEmail() {
-    const emailInput = document.getElementById('signupEmail');
-    const email = emailInput.value.trim();
-    
-    const existingError = emailInput.parentElement.querySelector('.error-text');
-    if (existingError) existingError.remove();
-    emailInput.classList.remove('error');
-    
-    if (email && !email.endsWith('@iskolarngbayan.pup.edu.ph')) {
-        emailInput.classList.add('error');
-        const errorMsg = document.createElement('span');
-        errorMsg.className = 'error-text';
-        errorMsg.textContent = 'Primary email must use @iskolarngbayan.pup.edu.ph';
-        emailInput.parentElement.appendChild(errorMsg);
-        return false;
-    }
-    return true;
-}
-
-function validateSecondaryEmail() {
-    const emailInput = document.getElementById('signupSecondaryEmail');
-    const email = emailInput.value.trim();
-    
-    const existingError = emailInput.parentElement.querySelector('.error-text');
-    if (existingError) existingError.remove();
-    emailInput.classList.remove('error');
-    
-    if (email && !email.endsWith('@gmail.com')) {
-        emailInput.classList.add('error');
-        const errorMsg = document.createElement('span');
-        errorMsg.className = 'error-text';
-        errorMsg.textContent = 'Secondary email must use @gmail.com';
-        emailInput.parentElement.appendChild(errorMsg);
-        return false;
-    }
-    return true;
-}
-
-function formatStudentId(e) {
-    let value = e.target.value.toUpperCase();
-    value = value.replace(/[^0-9A-Z-]/g, '');
-    
-    if (value.length > 4 && value[4] !== '-') {
-        value = value.slice(0, 4) + '-' + value.slice(4);
-    }
-    if (value.length > 10 && value[10] !== '-') {
-        value = value.slice(0, 10) + '-' + value.slice(10);
-    }
-    if (value.length > 13 && value[13] !== '-') {
-        value = value.slice(0, 13) + '-' + value.slice(13);
-    }
-    
-    e.target.value = value;
-}
-
-function validateStudentId() {
-    const idInput = document.getElementById('signupStudentId');
-    const studentId = idInput.value.trim();
-    
-    const existingError = idInput.parentElement.querySelector('.error-text');
-    if (existingError) existingError.remove();
-    idInput.classList.remove('error');
-    
-    const pattern = /^[0-9]{4}-[0-9]{5}-[A-Z]{2}-[0-9]$/;
-    
-    if (studentId && !pattern.test(studentId)) {
-        idInput.classList.add('error');
-        const errorMsg = document.createElement('span');
-        errorMsg.className = 'error-text';
-        errorMsg.textContent = 'Student ID must follow format: YYYY-NNNNN-XX-N (e.g., 2021-12345-MN-0)';
-        idInput.parentElement.appendChild(errorMsg);
-        return false;
-    }
-    return true;
-}
-
-function validateSection() {
-    const sectionInput = document.getElementById('signupSection');
-    const section = sectionInput.value.trim().toUpperCase();
-    
-    const existingError = sectionInput.parentElement.querySelector('.error-text');
-    if (existingError) existingError.remove();
-    sectionInput.classList.remove('error');
-    
-    const pattern = /^[0-9]+P?$/;
-    
-    if (section && !pattern.test(section)) {
-        sectionInput.classList.add('error');
-        const errorMsg = document.createElement('span');
-        errorMsg.className = 'error-text';
-        errorMsg.textContent = 'Section must be a number or number followed by P (e.g., 1, 2, 1P, 2P)';
-        sectionInput.parentElement.appendChild(errorMsg);
-        return false;
-    }
-    
-    sectionInput.value = section;
-    return true;
-}
-
-function handleRoleChange(e) {
-    const role = e.target.value;
-    const studentFields = document.getElementById('studentFields');
-    const officerFields = document.getElementById('officerFields');
-    
-    studentFields.classList.add('hidden');
-    officerFields.classList.add('hidden');
-    
-    if (role === 'student' || role === 'student_rep') {
-        studentFields.classList.remove('hidden');
-        
-        document.getElementById('signupYear').required = true;
-        document.getElementById('signupSection').required = true;
-        
-        if (role === 'student_rep') {
-            officerFields.classList.remove('hidden');
-            document.getElementById('signupOfficerRole').required = true;
-        } else {
-            document.getElementById('signupOfficerRole').required = false;
-        }
-    } else {
-        document.getElementById('signupYear').required = false;
-        document.getElementById('signupSection').required = false;
-        document.getElementById('signupOfficerRole').required = false;
-    }
-}
-
-function handleLogin(e) {
+/* -------------------------
+   LOGIN (PHP)
+--------------------------*/
+async function handleLogin(e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const user = users.find(u => 
-        (u.email === email || u.secondaryEmail === email) && u.password === password
-    );
-    
-    if (user) {
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        
+    const selectedRole = document.getElementById('loginRole').value;
+
+    if (!email || !password) {
+        showMessage('Please fill in all fields', 'error');
+        return;
+    }
+
+    if (!selectedRole) {
+        showMessage('Please select your role', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/AuthController.php?action=login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            showMessage(data.message, 'error');
+            return;
+        }
+
+        // Verify that selected role matches user's actual role
+        if (data.user.role !== selectedRole) {
+            showMessage('Selected role does not match your account. Please select the correct role.', 'error');
+            return;
+        }
+
+        // Store user session in localStorage
+        localStorage.setItem('sessionUser', JSON.stringify(data.user));
+
         showMessage('Login successful! Redirecting...', 'success');
-        
-        setTimeout(() => {
-            redirectToDashboard(user.role);
-        }, 1000);
-    } else {
-        showMessage('Invalid email or password', 'error');
+        setTimeout(() => redirectToDashboard(data.role), 800);
+
+    } catch (err) {
+        console.error('Login error:', err);
+        showMessage('Server connection error. Please try again.', 'error');
     }
 }
 
-function handleSignup(e) {
+/* -------------------------
+   SIGNUP (PHP)
+--------------------------*/
+async function handleSignup(e) {
     e.preventDefault();
+
+    if (!validatePrimaryEmail()) {
+        showMessage('Primary email must be a PUP email address', 'error');
+        return;
+    }
     
-    const isPrimaryEmailValid = validatePrimaryEmail();
-    const isSecondaryEmailValid = validateSecondaryEmail();
-    const isStudentIdValid = validateStudentId();
+    if (!validateSecondaryEmail()) {
+        showMessage('Secondary email must be a Gmail address', 'error');
+        return;
+    }
     
+    if (!validateStudentId()) {
+        showMessage('Invalid student ID format', 'error');
+        return;
+    }
+
     const role = document.getElementById('signupRole').value;
-    let isSectionValid = true;
-    if (role === 'student' || role === 'student_rep') {
-        isSectionValid = validateSection();
-    }
-    
-    if (!isPrimaryEmailValid || !isSecondaryEmailValid || !isStudentIdValid || !isSectionValid) {
-        showMessage('Please fix the errors before submitting', 'error');
+
+    if (!role) {
+        showMessage('Please select a role', 'error');
         return;
     }
-    
-    const firstNameElement = document.getElementById('signupFirstName');
-    const middleNameElement = document.getElementById('signupMiddleName');
-    const surnameElement = document.getElementById('signupSurname');
-    
-    if (!firstNameElement || !middleNameElement || !surnameElement) {
-        showMessage('Error: Name fields not found. Please refresh the page.', 'error');
-        console.error('Missing name field elements');
-        return;
-    }
-    
-    const firstName = firstNameElement.value.trim();
-    const middleName = middleNameElement.value.trim();
-    const surname = surnameElement.value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const secondaryEmail = document.getElementById('signupSecondaryEmail').value.trim();
-    const studentId = document.getElementById('signupStudentId').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    
-    let year = null;
-    let section = null;
-    let officerRole = null;
-    
+
+    const payload = {
+        firstName: document.getElementById('signupFirstName').value.trim(),
+        middleName: document.getElementById('signupMiddleName').value.trim(),
+        surname: document.getElementById('signupSurname').value.trim(),
+        email: document.getElementById('signupEmail').value.trim(),
+        secondaryEmail: document.getElementById('signupSecondaryEmail').value.trim() || null,
+        studentId: document.getElementById('signupStudentId').value.trim(),
+        password: document.getElementById('signupPassword').value,
+        role,
+        year: null,
+        section: null,
+        officerRole: null
+    };
+
     if (role === 'student' || role === 'student_rep') {
-        year = document.getElementById('signupYear').value;
-        section = document.getElementById('signupSection').value.trim().toUpperCase();
+        payload.year = document.getElementById('signupYear').value;
+        payload.section = document.getElementById('signupSection').value.toUpperCase();
         
+        if (!payload.year || !payload.section) {
+            showMessage('Year and section are required for students', 'error');
+            return;
+        }
+
+        if (!validateSection()) {
+            showMessage('Invalid section format. Use format like 1, 2, 1P, 2P', 'error');
+            return;
+        }
+
         if (role === 'student_rep') {
-            officerRole = document.getElementById('signupOfficerRole').value;
+            payload.officerRole = document.getElementById('signupOfficerRole').value;
+            if (!payload.officerRole) {
+                showMessage('Officer position is required for student representatives', 'error');
+                return;
+            }
         }
     }
-    
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    if (users.find(u => u.email === email)) {
-        showMessage('Primary email already exists', 'error');
-        return;
+
+    try {
+        const res = await fetch(`${API_URL}/AuthController.php?action=signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        // Check if response is JSON
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.error('Server response (not JSON):', text);
+            showMessage('Server error: Invalid response format. Check console for details.', 'error');
+            return;
+        }
+
+        const data = await res.json();
+        console.log('Signup response:', data); // Debug log
+
+        if (!data.success) {
+            showMessage(data.message, 'error');
+            return;
+        }
+
+        showMessage('Account created successfully! Please login.', 'success');
+        document.getElementById('signupFormElement').reset();
+        document.getElementById('studentFields').classList.add('hidden');
+        document.getElementById('officerFields').classList.add('hidden');
+        
+        setTimeout(() => toggleForms('login'), 1500);
+
+    } catch (err) {
+        console.error('Signup error:', err);
+        showMessage('Server error during signup: ' + err.message, 'error');
     }
-    if (secondaryEmail && users.find(u => u.secondaryEmail === secondaryEmail)) {
-        showMessage('Secondary email already exists', 'error');
-        return;
-    }
-    if (users.find(u => u.studentId === studentId)) {
-        showMessage('Student ID already exists', 'error');
-        return;
-    }
-    
-    const newUser = {
-        id: generateId(),
-        firstName,
-        middleName,
-        surname,
-        email,
-        secondaryEmail: secondaryEmail || null,
-        studentId,
-        password,
-        role,
-        year,
-        section,
-        officerRole
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    showMessage('Account created successfully! Please login.', 'success');
-    
-    document.getElementById('signupFormElement').reset();
-    setTimeout(() => {
-        toggleForms('login');
-    }, 1500);
 }
 
+/* -------------------------
+   SESSION CHECK (PHP)
+--------------------------*/
+async function checkExistingSession() {
+    try {
+        const res = await fetch(`${API_URL}/AuthController.php?action=session`);
+        const data = await res.json();
+
+        if (data.loggedIn && data.user) {
+            // Store user session in localStorage
+            localStorage.setItem('sessionUser', JSON.stringify(data.user));
+            redirectToDashboard(data.role);
+        }
+    } catch (err) {
+        console.error('Session check error:', err);
+    }
+}
+
+/* -------------------------
+   LOGOUT (PHP)
+--------------------------*/
+async function logout() {
+    try {
+        await fetch(`${API_URL}/AuthController.php?action=logout`, { method: 'POST' });
+    } catch (err) {
+        console.error('Logout error:', err);
+    }
+    
+    localStorage.removeItem('sessionUser');
+    window.location.href = '/index.html';
+}
+
+/* -------------------------
+   DASHBOARD ROUTER
+--------------------------*/
 function redirectToDashboard(role) {
-    const dashboards = {
-        'professor': 'professor-dashboard.html',
-        'student': 'student-dashboard.html',
-        'student_rep': 'student-rep-dashboard.html',
-        'room_admin': 'room-admin-dashboard.html',
-        'chairperson': 'chairperson-dashboard.html'
+    const map = {
+        professor: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/professor.html',
+        student: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student.html',
+        student_rep: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student-rep.html',
+        room_admin: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/room-admin.html',
+        chairperson: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/chairperson.html'
     };
     
-    const dashboardUrl = dashboards[role];
-    if (dashboardUrl) {
-        window.location.href = dashboardUrl;
+    const path = map[role];
+    if (path) {
+        window.location.href = path;
     } else {
         showMessage('Invalid role', 'error');
     }
 }
 
-function checkExistingSession() {
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-        const user = JSON.parse(currentUser);
-        redirectToDashboard(user.role);
-    }
-}
-
-function generateId() {
-    return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
-
-function showMessage(text, type) {
-    const message = document.getElementById('message');
-    message.textContent = text;
-    message.className = 'message ' + type;
-    message.classList.remove('hidden');
-}
-
-function getCurrentUser() {
-    const user = localStorage.getItem('currentUser');
-    return user ? JSON.parse(user) : null;
-}
-
-function isProfessor() {
-    const user = getCurrentUser();
-    return user && user.role === 'professor';
-}
-
-function isStudent() {
-    const user = getCurrentUser();
-    return user && user.role === 'student';
-}
-
-function isStudentRep() {
-    const user = getCurrentUser();
-    return user && user.role === 'student_rep';
-}
-
-function isRoomAdmin() {
-    const user = getCurrentUser();
-    return user && user.role === 'room_admin';
-}
-
-function isChairperson() {
-    const user = getCurrentUser();
-    return user && user.role === 'chairperson';
-}
-
-function requireRole(allowedRoles) {
-    const user = getCurrentUser();
-    if (!user) {
-        window.location.href = 'login.html';
-        return false;
+/* -------------------------
+   VALIDATION FUNCTIONS
+--------------------------*/
+function validatePrimaryEmail() {
+    const email = document.getElementById('signupEmail').value.trim();
+    const isValid = email.endsWith('@iskolarngbayan.pup.edu.ph');
+    
+    if (email && !isValid) {
+        document.getElementById('signupEmail').classList.add('error');
+    } else {
+        document.getElementById('signupEmail').classList.remove('error');
     }
     
-    if (!allowedRoles.includes(user.role)) {
-        alert('Unauthorized access! Redirecting to your dashboard.');
-        redirectToDashboard(user.role);
-        return false;
-    }
-    
-    return true;
+    return isValid || !email;
 }
 
-function logout() {
-    localStorage.removeItem('currentUser');
-    window.location.href = 'login.html';
+function validateSecondaryEmail() {
+    const email = document.getElementById('signupSecondaryEmail').value.trim();
+    const isValid = !email || email.endsWith('@gmail.com');
+    
+    if (email && !isValid) {
+        document.getElementById('signupSecondaryEmail').classList.add('error');
+    } else {
+        document.getElementById('signupSecondaryEmail').classList.remove('error');
+    }
+    
+    return isValid;
 }
+
+function validateStudentId() {
+    const id = document.getElementById('signupStudentId').value.trim();
+    const isValid = /^[0-9]{4}-[0-9]{5}-[A-Z]{2}-[0-9]$/.test(id);
+    
+    if (id && !isValid) {
+        document.getElementById('signupStudentId').classList.add('error');
+    } else {
+        document.getElementById('signupStudentId').classList.remove('error');
+    }
+    
+    return isValid || !id;
+}
+
+function validateSection() {
+    const section = document.getElementById('signupSection').value.trim().toUpperCase();
+    const isValid = /^[0-9]+P?$/.test(section);
+    
+    if (section && !isValid) {
+        document.getElementById('signupSection').classList.add('error');
+    } else {
+        document.getElementById('signupSection').classList.remove('error');
+    }
+    
+    return isValid || !section;
+}
+
+function formatStudentId(e) {
+    let value = e.target.value.toUpperCase().replace(/[^0-9A-Z-]/g, '');
+    e.target.value = value;
+}
+
+/* -------------------------
+   ROLE UI HANDLER
+--------------------------*/
+function handleRoleChange(e) {
+    const role = e.target.value;
+    const studentFields = document.getElementById('studentFields');
+    const officerFields = document.getElementById('officerFields');
+    
+    if (role === 'student' || role === 'student_rep') {
+        studentFields.classList.remove('hidden');
+    } else {
+        studentFields.classList.add('hidden');
+    }
+    
+    if (role === 'student_rep') {
+        officerFields.classList.remove('hidden');
+    } else {
+        officerFields.classList.add('hidden');
+    }
+}
+
+/* -------------------------
+   MESSAGE DISPLAY
+--------------------------*/
+function showMessage(msg, type) {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = msg;
+    messageDiv.className = `message ${type}`;
+    messageDiv.classList.remove('hidden');
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+        hideMessage();
+    }, 5000);
+}
+
+function hideMessage() {
+    const messageDiv = document.getElementById('message');
+    messageDiv.classList.add('hidden');
+}
+
+// Export for use in other modules
+window.authModule = {
+    logout,
+    getSessionUser: () => {
+        const user = localStorage.getItem('sessionUser');
+        return user ? JSON.parse(user) : null;
+    }
+};

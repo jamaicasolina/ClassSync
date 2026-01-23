@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chairperson Dashboard - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <link rel="stylesheet" href="../../css/chairperson.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Chairperson</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="chairperson.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../chairperson/attendance-reports.html" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span>Attendance Reports</span>
+                </a>
+                <a href="../chairperson/schedule-changes.html" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Schedule Changes</span>
+                </a>
+                <a href="../chairperson/notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Welcome, <span id="chairpersonName">Chairperson</span></h1>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <h3 id="totalReports">0</h3>
+                            <p>Attendance Reports</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="pendingScheduleChanges">0</h3>
+                            <p>Pending Schedule Changes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <h3 id="approvedScheduleChanges">0</h3>
+                            <p>Approved Changes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Attendance Reports -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Attendance Reports</h2>
+                        <a href="../chairperson/attendance-reports.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="attendanceReportsList">
+                        <p class="no-data">No attendance reports available.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Schedule Changes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Schedule Changes</h2>
+                        <a href="../chairperson/schedule-changes.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="scheduleChangesList">
+                        <p class="no-data">No schedule changes pending or approved.</p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Notifications</h2>
+                        <a href="../chairperson/notifications.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="notificationsList">
+                        <p class="no-data">No new notifications</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script>
+        requireRole('chairperson');
+
+        const user = getSessionUser();
+        if (user) {
+            document.getElementById('chairpersonName').textContent = user.first_name;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', e => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) logout();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // TODO: fetch attendance reports, schedule changes count (pending & approved)
+
+                document.getElementById('totalReports').textContent = '0';
+                document.getElementById('pendingScheduleChanges').textContent = '0';
+                document.getElementById('approvedScheduleChanges').textContent = '0';
+
+                document.getElementById('attendanceReportsList').innerHTML = '<p class="no-data">No attendance reports available.</p>';
+                document.getElementById('scheduleChangesList').innerHTML = '<p class="no-data">No schedule changes pending or approved.</p>';
+                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

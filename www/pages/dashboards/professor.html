@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Dashboard - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/professor.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Professor</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="professor.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../professor/courses.html" class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>Courses</span>
+                </a>
+                <a href="../professor/schedules.html" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Schedules</span>
+                </a>
+                <a href="../professor/attendance.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    <span>Attendance</span>
+                </a>
+                <a href="../professor/notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Welcome, <span id="professorName">Professor</span></h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="window.location.href='../professor/courses.html'">
+                        + Add Course
+                    </button>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <h3 id="totalCourses">0</h3>
+                            <p>Total Courses</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>Total Students</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="todayClasses">0</h3>
+                            <p>Today's Classes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✓</div>
+                        <div class="stat-info">
+                            <h3 id="openSessions">0</h3>
+                            <p>Open Attendance</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Today's Schedule</h2>
+                        <a href="../professor/schedules.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="todaySchedule">
+                            <p class="no-data">Loading schedule...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Courses -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>My Courses</h2>
+                        <a href="../professor/courses.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="coursesList">
+                            <p class="no-data">Loading courses...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Notifications</h2>
+                        <a href="../professor/notifications.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="notificationsList">
+                            <p class="no-data">No notifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script>
+        // Check authentication and role
+        requireRole('professor');
+
+        // Display professor name
+        const user = getSessionUser();
+        if (user) {
+            document.getElementById('professorName').textContent = user.first_name;
+        }
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                logout();
+            }
+        });
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // TODO: Implement API calls to fetch:
+                // - Total courses
+                // - Total enrolled students
+                // - Today's classes
+                // - Open attendance sessions
+                // - Today's schedule
+                // - Recent courses
+                // - Recent notifications
+                
+                // Placeholder data
+                document.getElementById('totalCourses').textContent = '0';
+                document.getElementById('totalStudents').textContent = '0';
+                document.getElementById('todayClasses').textContent = '0';
+                document.getElementById('openSessions').textContent = '0';
+                
+                document.getElementById('todaySchedule').innerHTML = '<p class="no-data">No classes scheduled for today</p>';
+                document.getElementById('coursesList').innerHTML = '<p class="no-data">No courses created yet. <a href="../professor/courses.html">Create your first course</a></p>';
+                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>

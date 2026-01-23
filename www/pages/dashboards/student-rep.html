@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Rep Dashboard - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <link rel="stylesheet" href="../../css/student-rep.css" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Student Representative</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="student-rep.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="../student-rep/attendance-input.html" class="nav-item">
+                    <span class="nav-icon">✍️</span>
+                    <span>Input Attendance</span>
+                </a>
+                <a href="../student-rep/courses-sched.html" class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>My Courses & Schedules</span>
+                </a>
+                <a href="../student-rep/notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                    <span class="notification-badge" id="notifBadge">0</span>
+                </a>
+                <a href="../student-rep/rooms.html" class="nav-item">
+                    <span class="nav-icon">🏫</span>
+                    <span>Room Availability</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Welcome, <span id="repName">Student Rep</span></h1>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-info">
+                            <h3 id="blockCoursesCount">0</h3>
+                            <p>Courses in Block/Section</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <h3 id="weekScheduleCount">0</h3>
+                            <p>This Week's Classes</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✍️</div>
+                        <div class="stat-info">
+                            <h3 id="attendanceSessionsOpen">0</h3>
+                            <p>Open Attendance Sessions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Schedules -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Upcoming Class Schedules</h2>
+                        <a href="../student-rep/courses-sched.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="upcomingSchedules">
+                        <p class="no-data">Loading schedules...</p>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Notifications</h2>
+                        <a href="../student-rep/notifications.html" class="link">View All</a>
+                    </div>
+                    <div class="card-body" id="notificationsList">
+                        <p class="no-data">No new notifications</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script>
+        requireRole('student_rep');
+
+        const user = getSessionUser();
+        if (user) {
+            document.getElementById('repName').textContent = user.first_name;
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', e => {
+            e.preventDefault();
+            if (confirm('Are you sure you want to logout?')) logout();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // TODO: fetch:
+                // block courses count, this week's schedules, open attendance sessions
+
+                document.getElementById('blockCoursesCount').textContent = '0';
+                document.getElementById('weekScheduleCount').textContent = '0';
+                document.getElementById('attendanceSessionsOpen').textContent = '0';
+
+                document.getElementById('upcomingSchedules').innerHTML = '<p class="no-data">No schedules available.</p>';
+                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+</html>
