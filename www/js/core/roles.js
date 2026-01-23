@@ -1,20 +1,15 @@
 // js/core/roles.js
-// Role-based access control and session management
-
-/* -------------------------
-   SESSION MANAGEMENT
---------------------------*/
 
 /**
  * Get current session user from localStorage
- * @returns {Object|null} User object or null
+ * @returns {Object|null} User object or null if not logged in
  */
 function getSessionUser() {
-    const userData = localStorage.getItem('sessionUser');
-    if (!userData) return null;
+    const userStr = localStorage.getItem('sessionUser');
+    if (!userStr) return null;
     
     try {
-        return JSON.parse(userData);
+        return JSON.parse(userStr);
     } catch (e) {
         console.error('Error parsing session user:', e);
         return null;
@@ -22,46 +17,54 @@ function getSessionUser() {
 }
 
 /**
- * Update session user data in localStorage
- * @param {Object} userData - Updated user data
+ * Update session user in localStorage
+ * @param {Object} user - Updated user object
  */
-function updateSessionUser(userData) {
-    localStorage.setItem('sessionUser', JSON.stringify(userData));
+function updateSessionUser(user) {
+    localStorage.setItem('sessionUser', JSON.stringify(user));
 }
 
 /**
- * Clear session and redirect to login
+ * Check if user is logged in
+ * @returns {boolean}
  */
-function clearSession() {
-    localStorage.removeItem('sessionUser');
-    window.location.href = '/login.html';
+function isLoggedIn() {
+    return getSessionUser() !== null;
 }
 
-/* -------------------------
-   ROLE ACCESS CONTROL
---------------------------*/
+/**
+ * Get user role
+ * @returns {string|null} User role or null
+ */
+function getUserRole() {
+    const user = getSessionUser();
+    return user ? user.role : null;
+}
 
 /**
- * Check if user has required role(s)
- * Redirects to login if no session or unauthorized
+ * Require user to be logged in
+ * Redirects to login page if not logged in
+ */
+function requireAuth() {
+    if (!isLoggedIn()) {
+        window.location.href = '/FINAL_PROJECT/ClassSync/www/index.html';
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Require specific role(s) to access page
  * @param {string|string[]} allowedRoles - Single role or array of allowed roles
  */
 function requireRole(allowedRoles) {
+    if (!requireAuth()) return false;
+    
     const user = getSessionUser();
-    
-    // Check if user is logged in
-    if (!user) {
-        alert('You must be logged in to access this page');
-        window.location.href = '/login.html';
-        return false;
-    }
-    
-    // Convert single role to array for consistency
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     
-    // Check if user's role is in allowed roles
     if (!roles.includes(user.role)) {
-        alert('Access denied: You do not have permission to view this page');
+        alert('Access denied. You do not have permission to view this page.');
         redirectToDashboard(user.role);
         return false;
     }
@@ -70,7 +73,7 @@ function requireRole(allowedRoles) {
 }
 
 /**
- * Check if current user has a specific role
+ * Check if user has specific role
  * @param {string} role - Role to check
  * @returns {boolean}
  */
@@ -80,7 +83,7 @@ function hasRole(role) {
 }
 
 /**
- * Check if current user has any of the specified roles
+ * Check if user has any of the specified roles
  * @param {string[]} roles - Array of roles to check
  * @returns {boolean}
  */
@@ -89,169 +92,130 @@ function hasAnyRole(roles) {
     return user && roles.includes(user.role);
 }
 
-/* -------------------------
-   ROLE INFORMATION
---------------------------*/
-
-const ROLE_INFO = {
-    professor: {
-        name: 'Professor',
-        dashboard: '/pages/dashboards/professor.html',
-        color: '#800000',
-        permissions: ['create_course', 'manage_schedule', 'open_attendance', 'view_rooms']
-    },
-    student: {
-        name: 'Student',
-        dashboard: '/pages/dashboards/student.html',
-        color: '#ffd700',
-        permissions: ['view_attendance', 'view_schedule', 'view_rooms']
-    },
-    student_rep: {
-        name: 'Student Representative',
-        dashboard: '/pages/dashboards/studentrep.html',
-        color: '#a52a2a',
-        permissions: ['view_attendance', 'input_attendance', 'view_schedule', 'view_rooms', 'book_room']
-    },
-    room_admin: {
-        name: 'Room Administrator',
-        dashboard: '/pages/dashboards/room-admin.html',
-        color: '#5c0000',
-        permissions: ['manage_rooms', 'view_schedule']
-    },
-    chairperson: {
-        name: 'Chairperson',
-        dashboard: '/pages/dashboards/chairperson.html',
-        color: '#333333',
-        permissions: ['view_reports', 'view_all_attendance', 'view_all_schedules']
-    }
-};
-
 /**
- * Get information about a role
- * @param {string} role - Role identifier
- * @returns {Object|null}
- */
-function getRoleInfo(role) {
-    return ROLE_INFO[role] || null;
-}
-
-/**
- * Get current user's role information
- * @returns {Object|null}
- */
-function getCurrentRoleInfo() {
-    const user = getSessionUser();
-    return user ? getRoleInfo(user.role) : null;
-}
-
-/**
- * Redirect user to their role-specific dashboard
- * @param {string} role - Role identifier
+ * Redirect to appropriate dashboard based on role
+ * @param {string} role - User role
  */
 function redirectToDashboard(role) {
-    const roleInfo = getRoleInfo(role);
-    if (roleInfo) {
-        window.location.href = roleInfo.dashboard;
+    const dashboardMap = {
+        professor: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/professor.html',
+        student: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student.html',
+        student_rep: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student-rep.html',
+        room_admin: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/room-admin.html',
+        chairperson: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/chairperson.html'
+    };
+    
+    const path = dashboardMap[role];
+    if (path) {
+        window.location.href = path;
     } else {
-        console.error('Invalid role:', role);
-        clearSession();
+        console.error('Unknown role:', role);
+        window.location.href = '/FINAL_PROJECT/ClassSync/www/index.html';
     }
 }
 
-/* -------------------------
-   DISPLAY USER INFO
---------------------------*/
-
 /**
- * Get formatted user display name
- * @param {Object} user - User object
+ * Get user display name
  * @returns {string}
  */
-function getDisplayName(user) {
-    if (!user) return 'Unknown User';
-    
-    const parts = [];
-    if (user.first_name) parts.push(user.first_name);
-    if (user.middle_name) parts.push(user.middle_name.charAt(0) + '.');
-    if (user.surname) parts.push(user.surname);
-    
-    return parts.join(' ') || user.email || 'User';
-}
-
-/**
- * Get user's year and section (for students)
- * @param {Object} user - User object
- * @returns {string}
- */
-function getYearSection(user) {
-    if (!user || !user.year_level || !user.section) return '';
-    return `${user.year_level}-${user.section}`;
-}
-
-/**
- * Render user info in the UI
- * @param {string} containerId - ID of container element
- */
-function renderUserInfo(containerId) {
+function getUserDisplayName() {
     const user = getSessionUser();
-    if (!user) return;
+    if (!user) return 'Guest';
     
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    const roleInfo = getRoleInfo(user.role);
-    const displayName = getDisplayName(user);
-    const yearSection = getYearSection(user);
-    
-    container.innerHTML = `
-        <div class="user-info">
-            <div class="user-name">${displayName}</div>
-            <div class="user-role">${roleInfo ? roleInfo.name : user.role}</div>
-            ${yearSection ? `<div class="user-section">${yearSection}</div>` : ''}
-            <div class="user-email">${user.email}</div>
-        </div>
-    `;
+    return `${user.first_name} ${user.surname}`;
 }
-
-/* -------------------------
-   INIT PAGE GUARD
---------------------------*/
 
 /**
- * Initialize page with role check
- * Call this at the start of every protected page
- * @param {string|string[]} allowedRoles - Required role(s)
+ * Get user full details
+ * @returns {Object}
  */
-function initPage(allowedRoles) {
-    // Check if user has required role
-    if (!requireRole(allowedRoles)) {
-        return false;
-    }
+function getUserDetails() {
+    const user = getSessionUser();
+    if (!user) return null;
     
-    // Update last activity timestamp
-    localStorage.setItem('lastActivity', Date.now().toString());
-    
-    return true;
+    return {
+        id: user.id,
+        firstName: user.first_name,
+        middleName: user.middle_name,
+        surname: user.surname,
+        fullName: `${user.first_name} ${user.middle_name} ${user.surname}`,
+        email: user.email,
+        secondaryEmail: user.secondary_email,
+        studentId: user.student_id,
+        role: user.role,
+        yearLevel: user.year_level,
+        section: user.section,
+        officerRole: user.officer_role
+    };
 }
 
-/* -------------------------
-   EXPORTS
---------------------------*/
+/**
+ * Format role for display
+ * @param {string} role - Role code
+ * @returns {string}
+ */
+function formatRole(role) {
+    const roleMap = {
+        professor: 'Professor',
+        student: 'Student',
+        student_rep: 'Student Representative',
+        room_admin: 'Room Administrator',
+        chairperson: 'Chairperson'
+    };
+    
+    return roleMap[role] || role;
+}
 
-// Make functions available globally
-window.rolesModule = {
-    getSessionUser,
-    updateSessionUser,
-    clearSession,
-    requireRole,
-    hasRole,
-    hasAnyRole,
-    getRoleInfo,
-    getCurrentRoleInfo,
-    redirectToDashboard,
-    getDisplayName,
-    getYearSection,
-    renderUserInfo,
-    initPage,
-    ROLE_INFO
-};
+/**
+ * Format officer role for display
+ * @param {string} officerRole - Officer role code
+ * @returns {string}
+ */
+function formatOfficerRole(officerRole) {
+    const roleMap = {
+        president: 'President',
+        vice_president: 'Vice President',
+        secretary: 'Secretary',
+        treasurer: 'Treasurer',
+        auditor: 'Auditor',
+        pio: 'Public Information Officer'
+    };
+    
+    return roleMap[officerRole] || officerRole;
+}
+
+/**
+ * Logout user and redirect to login
+ */
+async function logout() {
+    try {
+        await fetch('http://localhost/classsync/api/controllers/AuthController.php?action=logout', {
+            method: 'POST'
+        });
+    } catch (err) {
+        console.error('Logout API error:', err);
+    }
+    
+    localStorage.removeItem('sessionUser');
+    window.location.href = '/FINAL_PROJECT/ClassSync/www/index.html';
+}
+
+// Export functions for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getSessionUser,
+        updateSessionUser,
+        isLoggedIn,
+        getUserRole,
+        requireAuth,
+        requireRole,
+        hasRole,
+        hasAnyRole,
+        redirectToDashboard,
+        getUserDisplayName,
+        getUserDetails,
+        formatRole,
+        formatOfficerRole,
+        logout
+    };
+}
