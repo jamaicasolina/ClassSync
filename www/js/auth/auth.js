@@ -233,7 +233,7 @@ function redirectToDashboard(role) {
     const map = {
         professor: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/professor.html',
         student: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student.html',
-        student_rep: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/student-rep.html',
+        student_rep: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/studentrep.html',
         room_admin: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/room-admin.html',
         chairperson: '/FINAL_PROJECT/ClassSync/www/pages/dashboards/chairperson.html'
     };
