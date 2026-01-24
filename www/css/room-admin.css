@@ -1,0 +1,159 @@
+body {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f5f6fa;
+}
+
+h2 {
+    margin-bottom: 5px;
+}
+
+/* Summary cards */
+.summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.summary-card h3 {
+    font-size: 28px;
+    margin: 5px 0 0;
+}
+
+.available {
+    color: #2ecc71;
+}
+
+.occupied {
+    color: #e74c3c;
+}
+
+.maintenance {
+    color: #f1c40f;
+}
+
+/* Room cards */
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.room-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.room-number {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.room-building {
+    font-size: 13px;
+    color: #777;
+}
+
+.room-capacity {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.badge-available {
+    background: #eafaf1;
+    color: #2ecc71;
+}
+
+.badge-occupied {
+    background: #fdecea;
+    color: #e74c3c;
+}
+
+.badge-maintenance {
+    background: #fff8e1;
+    color: #f1c40f;
+}
+
+select {
+    width: 100%;
+    padding: 6px;
+    margin-top: 10px;
+}
+.room-info {
+    margin-top: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.back-btn {
+    display: inline-block;
+    margin-bottom: 15px;
+    text-decoration: none;
+    color: #800000;
+    font-weight: 600;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}
+.room-card button {
+    margin-top: 6px;
+    padding: 6px;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.room-card button.danger {
+    background: #dc3545;
+    color: white;
+}
+.add-room-btn {
+    background: #800000;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.add-room-btn:hover {
+    opacity: 0.9;
+}
+.usage-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.usage-item strong {
+    color: #8b0000;
+}
+
+.usage-item span {
+    font-weight: 600;
+}
