@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Rooms Availability | ClassSync</title>
+    <meta charset="UTF-8" />
+    <title>Room Availability | ClassSync</title>
 
     <!-- Global styles -->
     <link rel="stylesheet" href="../../css/main.css">
-
-    <!-- Rooms dashboard styles -->
     <link rel="stylesheet" href="../../css/room-admin.css">
 </head>
 <body>
 
-    <h2>Manage Rooms</h2>
-    <button class="add-room-btn" onclick="addRoom()">+ Add Room</button>
+    <h2>Room Availability</h2>
 
-    <!-- Summary -->
+    <!-- STATUS SUMMARY -->
     <div class="summary">
         <div class="summary-card">
             <span>Available</span>
@@ -31,12 +28,11 @@
         </div>
     </div>
 
-    <!-- Rooms grid -->
+    <!-- ROOMS GRID -->
     <div class="room-grid" id="roomGrid">
         Loading rooms...
     </div>
 
-
-<script src="../../js/room-admin/rooms.js"></script>
+    <script src="../../js/student/student-room.js"></script>
 </body>
 </html>
