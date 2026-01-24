@@ -107,35 +107,86 @@
 
     <script src="../../js/core/roles.js"></script>
     <script>
-        requireRole('room_admin');
+requireRole('room_admin');
 
-        const user = getSessionUser();
-        if (user) {
-            document.getElementById('adminName').textContent = user.first_name;
-        }
+const user = getSessionUser();
+if (user) {
+    document.getElementById('adminName').textContent = user.first_name;
+}
 
-        document.getElementById('logoutBtn').addEventListener('click', e => {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) logout();
+document.getElementById('logoutBtn').addEventListener('click', e => {
+    e.preventDefault();
+    if (confirm('Are you sure you want to logout?')) logout();
+});
+
+const ROOMS_API =
+"/FINAL_PROJECT/ClassSync/api/controllers/RoomController.php";
+
+const USAGE_API =
+"/FINAL_PROJECT/ClassSync/api/controllers/RoomController.php?action=current-usage";
+
+async function loadDashboardData() {
+    try {
+        /* =========================
+           ROOM STATS
+        ========================= */
+        const roomsRes = await fetch(ROOMS_API);
+        const rooms = await roomsRes.json();
+
+        let total = rooms.length;
+        let available = 0;
+        let maintenance = 0;
+
+        rooms.forEach(room => {
+            if (room.status === 'available') available++;
+            if (room.status === 'maintenance') maintenance++;
         });
 
-        async function loadDashboardData() {
-            try {
-                // TODO: Fetch room stats and current usage
+        document.getElementById('totalRooms').textContent = total;
+        document.getElementById('availableRooms').textContent = available;
+        document.getElementById('maintenanceRooms').textContent = maintenance;
 
-                document.getElementById('totalRooms').textContent = '0';
-                document.getElementById('availableRooms').textContent = '0';
-                document.getElementById('maintenanceRooms').textContent = '0';
-                document.getElementById('currentUsageCount').textContent = '0';
+        /* =========================
+           CURRENT ROOM USAGE
+        ========================= */
+        const usageRes = await fetch(USAGE_API);
+        const usage = await usageRes.json();
 
-                document.getElementById('roomUsageList').innerHTML = '<p class="no-data">No rooms currently in use.</p>';
-                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
-            } catch (err) {
-                console.error(err);
-            }
+        document.getElementById('currentUsageCount').textContent = usage.length;
+
+        const usageList = document.getElementById('roomUsageList');
+
+        if (usage.length === 0) {
+            usageList.innerHTML =
+                '<p class="no-data">No rooms currently in use.</p>';
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
-    </script>
+        usageList.innerHTML = "";
+
+        usage.forEach(room => {
+            const div = document.createElement('div');
+            div.className = 'usage-item';
+
+            div.innerHTML = `
+                <strong>${room.room_number}</strong> (${room.building})<br>
+                <span>Professor:</span> ${room.professor}<br>
+                <span>Section:</span> ${room.section}<br>
+                <span>Time:</span> ${room.start_time} – ${room.end_time}
+            `;
+
+            usageList.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById('roomUsageList').innerHTML =
+            "<p class='no-data'>Failed to load room usage.</p>";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
+
 </body>
 </html>
