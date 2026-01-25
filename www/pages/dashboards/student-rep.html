@@ -6,11 +6,9 @@
     <title>Student Rep Dashboard - ClassSync</title>
     <link rel="stylesheet" href="../../css/main.css" />
     <link rel="stylesheet" href="../../css/dashboard.css" />
-    <link rel="stylesheet" href="../../css/student-rep.css" />
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>ClassSync</h2>
@@ -49,14 +47,12 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="content-header">
                 <h1>Welcome, <span id="repName">Student Rep</span></h1>
             </header>
 
             <div class="dashboard-grid">
-                <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">📚</div>
@@ -81,7 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Upcoming Schedules -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Upcoming Class Schedules</h2>
@@ -92,7 +87,6 @@
                     </div>
                 </div>
 
-                <!-- Notifications -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Notifications</h2>
@@ -122,9 +116,6 @@
 
         async function loadDashboardData() {
             try {
-                // TODO: fetch:
-                // block courses count, this week's schedules, open attendance sessions
-
                 document.getElementById('blockCoursesCount').textContent = '0';
                 document.getElementById('weekScheduleCount').textContent = '0';
                 document.getElementById('attendanceSessionsOpen').textContent = '0';

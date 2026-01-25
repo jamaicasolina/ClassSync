@@ -6,11 +6,9 @@
     <title>Chairperson Dashboard - ClassSync</title>
     <link rel="stylesheet" href="../../css/main.css" />
     <link rel="stylesheet" href="../../css/dashboard.css" />
-    <link rel="stylesheet" href="../../css/chairperson.css" />
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>ClassSync</h2>
@@ -45,14 +43,12 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="content-header">
                 <h1>Welcome, <span id="chairpersonName">Chairperson</span></h1>
             </header>
 
             <div class="dashboard-grid">
-                <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">📋</div>
@@ -77,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Attendance Reports -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Recent Attendance Reports</h2>
@@ -88,7 +83,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Schedule Changes -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Schedule Changes</h2>
@@ -99,7 +93,6 @@
                     </div>
                 </div>
 
-                <!-- Notifications -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Notifications</h2>
@@ -114,7 +107,7 @@
     </div>
 
     <script src="../../js/core/roles.js"></script>
-    <script>
+    <script src="../../js/">
         requireRole('chairperson');
 
         const user = getSessionUser();
@@ -129,7 +122,6 @@
 
         async function loadDashboardData() {
             try {
-                // TODO: fetch attendance reports, schedule changes count (pending & approved)
 
                 document.getElementById('totalReports').textContent = '0';
                 document.getElementById('pendingScheduleChanges').textContent = '0';

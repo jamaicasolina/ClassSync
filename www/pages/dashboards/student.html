@@ -6,131 +6,210 @@
     <title>Student Dashboard - ClassSync</title>
     <link rel="stylesheet" href="../../css/main.css" />
     <link rel="stylesheet" href="../../css/dashboard.css" />
-    <link rel="stylesheet" href="../../css/student.css" />
+    <style>
+        .schedule-toggle { display: flex; gap: 10px; margin-bottom: 15px; }
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid white;
+            background: whitesmoke;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .toggle-btn.active {
+            background: maroon;
+            color: white;
+            border-color: maroon;
+        }
+        .day-schedule { margin-bottom: 15px; }
+        .day-schedule h4 {
+            background: rgb(241, 241, 114);
+            padding: 10px;
+            margin: 0 0 10px 0;
+            border-left: 4px solid maroon;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>ClassSync</h2>
                 <p class="user-role">Student</p>
             </div>
             <nav class="sidebar-nav">
-                <a href="student.html" class="nav-item active">
-                    <span class="nav-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="../student/attendance.html" class="nav-item">
-                    <span class="nav-icon">✓</span>
-                    <span>My Attendance</span>
-                </a>
+                <a href="student.html" class="nav-item active"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="../student/courses.html" class="nav-item"><span class="nav-icon">📚</span><span>My Courses</span></a>
+                <a href="../student/schedule.html" class="nav-item"><span class="nav-icon">📅</span><span>My Schedule</span></a>
+                <a href="../student/attendance.html" class="nav-item"><span class="nav-icon">✓</span><span>My Attendance</span></a>
                 <a href="../student/notifications.html" class="nav-item">
-                    <span class="nav-icon">🔔</span>
-                    <span>Notifications</span>
-                    <span class="notification-badge" id="notifBadge">0</span>
+                <span class="nav-icon">🔔</span><span>Notifications</span>
+                <span class="notification-badge" id="notifBadge">0</span>
                 </a>
-                <a href="../student/student-room.html" class="nav-item">
-                    <span class="nav-icon">🏫</span>
-                    <span>Room Availability</span>
-                </a>
-                <a href="../profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
-                    <span>Profile</span>
-                </a>
-                <a href="#" class="nav-item" id="logoutBtn">
-                    <span class="nav-icon">🚪</span>
-                    <span>Logout</span>
-                </a>
+                <a href="../student/student-room.html" class="nav-item"><span class="nav-icon">🏫</span><span>Room Availability</span></a>
+                <a href="../profile.html" class="nav-item"><span class="nav-icon">👤</span><span>Profile</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span>Logout</span></a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="content-header">
-                <h1>Welcome, <span id="studentName">Student</span></h1>
-            </header>
+  <main class="main-content">
+    <header class="content-header">
+      <h1>Welcome, <span id="studentName">Student</span></h1>
+    </header>
 
-            <div class="dashboard-grid">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📚</div>
-                        <div class="stat-info">
-                            <h3 id="totalCourses">0</h3>
-                            <p>Enrolled Courses</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-info">
-                            <h3 id="weekScheduleCount">0</h3>
-                            <p>This Week's Classes</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✓</div>
-                        <div class="stat-info">
-                            <h3 id="attendancePercentage">0%</h3>
-                            <p>Attendance Rate</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="dashboard-grid">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info"><h3 id="totalCourses">0</h3><p>Enrolled Courses</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info"><h3 id="weekScheduleCount">0</h3><p>This Week's Classes</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✓</div>
+          <div class="stat-info"><h3 id="attendancePercentage">0%</h3><p>Attendance Rate</p></div>
+        </div>
+      </div>
 
-                <!-- Weekly Schedule -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>This Week's Schedule</h2>
-                        <a href="../student/attendance.html" class="link">View Attendance</a>
-                    </div>
-                    <div class="card-body" id="weeklySchedule">
-                        <p class="no-data">Loading schedule...</p>
-                    </div>
-                </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>My Schedule</h2>
+          <a href="../student/schedule.html" class="link">View Full Schedule</a>
+        </div>
+        <div class="card-body">
+          <div class="schedule-toggle">
+            <button class="toggle-btn active" id="todayBtn">Today</button>
+            <button class="toggle-btn" id="weekBtn">This Week</button>
+          </div>
+          <div id="weeklySchedule"><p class="no-data">Loading schedule...</p></div>
+        </div>
+      </div>
 
-                <!-- Notifications -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Notifications</h2>
-                        <a href="../student/notifications.html" class="link">View All</a>
-                    </div>
-                    <div class="card-body" id="notificationsList">
-                        <p class="no-data">No new notifications</p>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <div class="card">
+        <div class="card-header">
+          <h2>Notifications</h2>
+          <a href="../student/notifications.html" class="link">View All</a>
+        </div>
+        <div class="card-body" id="notificationsList"><p class="no-data">No new notifications</p></div>
+      </div>
     </div>
+  </main>
+</div>
 
-    <script src="../../js/core/roles.js"></script>
-    <script>
-        requireRole('student');
+<script src="../../js/core/roles.js"></script>
+<script>
+  requireRole('student');
+  const user = getSessionUser();
+  if (user) document.getElementById('studentName').textContent = user.first_name;
 
-        const user = getSessionUser();
-        if (user) {
-            document.getElementById('studentName').textContent = user.first_name;
-        }
+  const logoutBtn = document.getElementById('logoutBtn');
+  logoutBtn.onclick = e => {
+    e.preventDefault();
+    if(confirm('Are you sure you want to logout?')) logout();
+  };
 
-        document.getElementById('logoutBtn').addEventListener('click', e => {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) logout();
-        });
+  const COURSE_API = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers/CourseController.php";
+  const SCHEDULE_API = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers/ScheduleController.php";
 
-        async function loadDashboardData() {
-            try {
-                // TODO: Fetch enrolled courses count, weekly classes count, attendance %
-                document.getElementById('totalCourses').textContent = '0';
-                document.getElementById('weekScheduleCount').textContent = '0';
-                document.getElementById('attendancePercentage').textContent = '0%';
+  let allSchedules = [], currentView = 'today';
 
-                document.getElementById('weeklySchedule').innerHTML = '<p class="no-data">No classes scheduled this week.</p>';
-                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
-            } catch (err) {
-                console.error(err);
-            }
-        }
+  const todayBtn = document.getElementById('todayBtn'),
+        weekBtn = document.getElementById('weekBtn'),
+        scheduleDiv = document.getElementById('weeklySchedule');
 
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
-    </script>
+  todayBtn.onclick = () => showScheduleView('today');
+  weekBtn.onclick = () => showScheduleView('week');
+
+  async function loadDashboardData() {
+    try {
+      const coursesData = await (await fetch(`${COURSE_API}?action=my_enrolled`, {credentials:'include'})).json();
+      document.getElementById('totalCourses').textContent = coursesData.success && coursesData.courses ? coursesData.courses.length : '0';
+
+      const scheduleData = await (await fetch(`${SCHEDULE_API}?action=my_student_schedules`, {credentials:'include'})).json();
+      if(scheduleData.success && scheduleData.schedules?.length) {
+        allSchedules = scheduleData.schedules.filter(s => !s.is_cancelled);
+        document.getElementById('weekScheduleCount').textContent = allSchedules.length;
+        showScheduleView(currentView);
+      } else {
+        document.getElementById('weekScheduleCount').textContent = '0';
+        scheduleDiv.innerHTML = '<p class="no-data">No classes scheduled. Enroll in courses to see your schedule.</p>';
+      }
+
+      document.getElementById('attendancePercentage').textContent = '0%';
+      document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
+    } catch (err) {
+      console.error('Error loading dashboard data:', err);
+      scheduleDiv.innerHTML = '<p class="no-data">Error loading schedule. Please refresh the page.</p>';
+    }
+  }
+
+  function showScheduleView(view) {
+    currentView = view;
+    todayBtn.classList.toggle('active', view === 'today');
+    weekBtn.classList.toggle('active', view === 'week');
+    view === 'today' ? showTodaySchedule() : showWeekSchedule();
+  }
+
+  function showTodaySchedule() {
+    const today = new Date().toLocaleDateString('en-US', {weekday:'long'}).toLowerCase();
+    const todaySchedules = allSchedules.filter(s => s.day_of_week === today);
+
+    if (!todaySchedules.length) {
+      const dayName = today.charAt(0).toUpperCase() + today.slice(1);
+      scheduleDiv.innerHTML = `<p class="no-data">No classes scheduled for ${dayName}.</p>`;
+      return;
+    }
+
+    todaySchedules.sort((a,b) => a.start_time.localeCompare(b.start_time));
+    scheduleDiv.innerHTML = `
+      <table class="table">
+        <thead><tr><th>Time</th><th>Course</th><th>Professor</th><th>Room</th></tr></thead>
+        <tbody>
+          ${todaySchedules.map(s => `
+            <tr>
+              <td><strong>${formatTime(s.start_time)} - ${formatTime(s.end_time)}</strong></td>
+              <td><strong>${s.course_code}</strong><br><small>${s.course_name}</small></td>
+              <td>${s.professor_name || 'N/A'}</td>
+              <td>${s.room_number ? `${s.room_number} (${s.building})` : 'TBA'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function showWeekSchedule() {
+    const days = ['monday','tuesday','wednesday','thursday','friday','saturday'];
+    let html = '', hasSchedule = false;
+
+    days.forEach(day => {
+      const daySchedules = allSchedules.filter(s => s.day_of_week === day);
+      if (daySchedules.length) {
+        hasSchedule = true;
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        daySchedules.sort((a,b) => a.start_time.localeCompare(b.start_time));
+        html += `<div class="day-schedule"><h4>${dayName}</h4><table class="table"><thead><tr><th>Time</th><th>Course</th><th>Professor</th><th>Room</th></tr></thead><tbody>
+          ${daySchedules.map(s => `
+            <tr>
+              <td><strong>${formatTime(s.start_time)} - ${formatTime(s.end_time)}</strong></td>
+              <td><strong>${s.course_code}</strong><br><small>${s.course_name}</small></td>
+              <td>${s.professor_name || 'N/A'}</td>
+              <td>${s.room_number ? `${s.room_number} (${s.building})` : 'TBA'}</td>
+            </tr>`).join('')}
+          </tbody></table></div>`;
+      }
+    });
+
+    scheduleDiv.innerHTML = hasSchedule ? html : '<p class="no-data">No classes scheduled for this week.</p>';
+  }
+
+  const formatTime = t => {
+    const [h,m] = t.split(':').map(Number);
+    const hr = h % 12 || 12;
+    return `${hr}:${m.toString().padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`;
+  };
+
+  document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
 </body>
 </html>

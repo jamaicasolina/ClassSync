@@ -1,11 +1,6 @@
 <?php
-/**
- * Database Configuration
- * This file handles the database connection
- */
 
 class Database {
-    // Database credentials
     private $host = "localhost";        // Usually localhost
     private $db_name = "classsync_db"; // Database name we created
     private $username = "root";         // Default XAMPP username

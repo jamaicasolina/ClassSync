@@ -1,187 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Professor Dashboard - ClassSync</title>
-    <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
-    <link rel="stylesheet" href="../../css/professor.css">
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <style>
+        .schedule-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid white;
+            background: whitesmoke;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .toggle-btn.active {
+            background: maroon;
+            color: white;
+            border-color: maroon;
+        }
+        .day-schedule {
+            margin-bottom: 15px;
+        }
+        .day-schedule h4 {
+            background: rgb(241, 241, 114);
+            padding: 10px;
+            margin: 0 0 10px 0;
+            border-left: 4px solid maroon;
+        }
+    </style>
 </head>
+
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>ClassSync</h2>
-                <p class="user-role">Professor</p>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="professor.html" class="nav-item active">
-                    <span class="nav-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="../professor/courses.html" class="nav-item">
-                    <span class="nav-icon">📚</span>
-                    <span>Courses</span>
-                </a>
-                <a href="../professor/schedules.html" class="nav-item">
-                    <span class="nav-icon">📅</span>
-                    <span>Schedules</span>
-                </a>
-                <a href="../professor/attendance.html" class="nav-item">
-                    <span class="nav-icon">✓</span>
-                    <span>Attendance</span>
-                </a>
-                <a href="../professor/notifications.html" class="nav-item">
-                    <span class="nav-icon">🔔</span>
-                    <span>Notifications</span>
-                    <span class="notification-badge" id="notifBadge">0</span>
-                </a>
-                <a href="../profile.html" class="nav-item">
-                    <span class="nav-icon">👤</span>
-                    <span>Profile</span>
-                </a>
-                <a href="#" class="nav-item" id="logoutBtn">
-                    <span class="nav-icon">🚪</span>
-                    <span>Logout</span>
-                </a>
-            </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="content-header">
-                <h1>Welcome, <span id="professorName">Professor</span></h1>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="window.location.href='../professor/courses.html'">
-                        + Add Course
-                    </button>
-                </div>
-            </header>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>ClassSync</h2>
+            <p class="user-role">Professor</p>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="professor.html" class="nav-item active">📊 Dashboard</a>
+            <a href="../professor/courses.html" class="nav-item">📚 Courses</a>
+            <a href="../professor/schedules.html" class="nav-item">📅 Schedules</a>
+            <a href="../professor/attendance.html" class="nav-item">✓ Attendance</a>
+            <a href="../professor/notifications.html" class="nav-item">🔔 Notifications</a>
+            <a href="../profile.html" class="nav-item">👤 Profile</a>
+            <a href="#" class="nav-item" id="logoutBtn">🚪 Logout</a>
+        </nav>
+  </aside>
 
-            <div class="dashboard-grid">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📚</div>
-                        <div class="stat-info">
-                            <h3 id="totalCourses">0</h3>
-                            <p>Total Courses</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-info">
-                            <h3 id="totalStudents">0</h3>
-                            <p>Total Students</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-info">
-                            <h3 id="todayClasses">0</h3>
-                            <p>Today's Classes</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✓</div>
-                        <div class="stat-info">
-                            <h3 id="openSessions">0</h3>
-                            <p>Open Attendance</p>
-                        </div>
-                    </div>
-                </div>
+  <main class="main-content">
 
-                <!-- Today's Schedule -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Today's Schedule</h2>
-                        <a href="../professor/schedules.html" class="link">View All</a>
-                    </div>
-                    <div class="card-body">
-                        <div id="todaySchedule">
-                            <p class="no-data">Loading schedule...</p>
-                        </div>
-                    </div>
-                </div>
+    <header class="content-header">
+      <h1>Welcome, <span id="professorName">Professor</span></h1>
+      <button class="btn btn-primary" onclick="location.href='../professor/courses.html'">+ Add Course</button>
+    </header>
 
-                <!-- Recent Courses -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>My Courses</h2>
-                        <a href="../professor/courses.html" class="link">View All</a>
-                    </div>
-                    <div class="card-body">
-                        <div id="coursesList">
-                            <p class="no-data">Loading courses...</p>
-                        </div>
-                    </div>
-                </div>
+    <div class="dashboard-grid">
 
-                <!-- Recent Notifications -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Recent Notifications</h2>
-                        <a href="../professor/notifications.html" class="link">View All</a>
-                    </div>
-                    <div class="card-body">
-                        <div id="notificationsList">
-                            <p class="no-data">No notifications</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📚</div><h3 id="totalCourses">0</h3><p>Total Courses</p></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><h3 id="totalStudents">0</h3><p>Total Students</p></div>
+        <div class="stat-card"><div class="stat-icon">📅</div><h3 id="todayClasses">0</h3><p>Today's Classes</p></div>
+        <div class="stat-card"><div class="stat-icon">✓</div><h3 id="openSessions">0</h3><p>Open Attendance</p></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>My Schedule</h2>
+          <a href="../professor/schedules.html" class="link">View Full Schedule</a>
+        </div>
+        <div class="card-body">
+          <div class="schedule-toggle">
+            <button class="toggle-btn active" id="todayBtn">Today</button>
+            <button class="toggle-btn" id="weekBtn">This Week</button>
+          </div>
+          <div id="professorSchedule"><p class="no-data">Loading schedule...</p></div>
+        </div>
+      </div>
+
     </div>
+  </main>
+</div>
 
-    <script src="../../js/core/roles.js"></script>
-    <script>
-        // Check authentication and role
-        requireRole('professor');
+<script src="../../js/core/roles.js"></script>
+<script>
+  requireRole('professor');
+  const user = getSessionUser();
+  if (user) document.getElementById('professorName').textContent = user.first_name;
 
-        // Display professor name
-        const user = getSessionUser();
-        if (user) {
-            document.getElementById('professorName').textContent = user.first_name;
-        }
+  document.getElementById('logoutBtn').onclick = e => {
+    e.preventDefault();
+    if (confirm('Logout?')) logout();
+  };
 
-        // Logout handler
-        document.getElementById('logoutBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) {
-                logout();
-            }
-        });
+  const COURSE_API = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers/CourseController.php";
+  const SCHEDULE_API = "http://localhost/FINAL_PROJECT/ClassSync/api/controllers/ScheduleController.php";
 
-        // Load dashboard data
-        async function loadDashboardData() {
-            try {
-                // TODO: Implement API calls to fetch:
-                // - Total courses
-                // - Total enrolled students
-                // - Today's classes
-                // - Open attendance sessions
-                // - Today's schedule
-                // - Recent courses
-                // - Recent notifications
-                
-                // Placeholder data
-                document.getElementById('totalCourses').textContent = '0';
-                document.getElementById('totalStudents').textContent = '0';
-                document.getElementById('todayClasses').textContent = '0';
-                document.getElementById('openSessions').textContent = '0';
-                
-                document.getElementById('todaySchedule').innerHTML = '<p class="no-data">No classes scheduled for today</p>';
-                document.getElementById('coursesList').innerHTML = '<p class="no-data">No courses created yet. <a href="../professor/courses.html">Create your first course</a></p>';
-                document.getElementById('notificationsList').innerHTML = '<p class="no-data">No new notifications</p>';
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-            }
-        }
+  let allSchedules = [], currentView = 'today';
 
-        // Load data on page load
-        document.addEventListener('DOMContentLoaded', loadDashboardData);
-    </script>
+  const todayBtn = document.getElementById('todayBtn'),
+        weekBtn = document.getElementById('weekBtn'),
+        professorSchedule = document.getElementById('professorSchedule');
+
+  todayBtn.onclick = () => showScheduleView('today');
+  weekBtn.onclick = () => showScheduleView('week');
+
+  async function loadDashboardData() {
+    try {
+      const courseData = await (await fetch(`${COURSE_API}?action=my_courses`)).json();
+      if (courseData.success) {
+        document.getElementById('totalCourses').textContent = courseData.courses.length;
+        document.getElementById('totalStudents').textContent =
+          courseData.courses.reduce((sum, c) => sum + +(c.enrolled_count || 0), 0);
+      }
+
+      const schedData = await (await fetch(`${SCHEDULE_API}?action=my_schedules`, {credentials: 'include'})).json();
+      if (schedData.success) {
+        allSchedules = schedData.schedules.filter(s => !s.is_cancelled);
+        showScheduleView(currentView);
+      } else {
+        professorSchedule.innerHTML = '<p class="no-data">No schedules available.</p>';
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function showScheduleView(view) {
+    currentView = view;
+    todayBtn.classList.toggle('active', view === 'today');
+    weekBtn.classList.toggle('active', view === 'week');
+    view === 'today' ? showTodaySchedule() : showWeekSchedule();
+  }
+
+  function showTodaySchedule() {
+    const today = new Date().toLocaleDateString('en-US', {weekday: 'long'}).toLowerCase(),
+          list = allSchedules.filter(s => s.day_of_week === today);
+    if (!list.length) return professorSchedule.innerHTML = '<p class="no-data">No classes today.</p>';
+    list.sort((a,b) => a.start_time.localeCompare(b.start_time));
+    professorSchedule.innerHTML = `
+      <table class="table">
+        <thead><tr><th>Time</th><th>Course</th><th>Room</th></tr></thead>
+        <tbody>
+          ${list.map(s => `
+            <tr>
+              <td>${formatTime(s.start_time)} - ${formatTime(s.end_time)}</td>
+              <td><strong>${s.course_code}</strong><br>${s.course_name}</td>
+              <td>${s.room_number || 'TBA'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function showWeekSchedule() {
+    const days = ['monday','tuesday','wednesday','thursday','friday','saturday'];
+    let html = '', hasData = false;
+    days.forEach(day => {
+      const dayList = allSchedules.filter(s => s.day_of_week === day);
+      if (dayList.length) {
+        hasData = true;
+        html += `<div class="day-schedule"><h4>${day.toUpperCase()}</h4><table class="table"><tbody>
+          ${dayList.map(s => `
+            <tr>
+              <td>${formatTime(s.start_time)} - ${formatTime(s.end_time)}</td>
+              <td>${s.course_code} - ${s.course_name}</td>
+              <td>${s.room_number || 'TBA'}</td>
+            </tr>`).join('')}
+          </tbody></table></div>`;
+      }
+    });
+    professorSchedule.innerHTML = hasData ? html : '<p class="no-data">No classes this week.</p>';
+  }
+
+  const formatTime = t => {
+    const [h,m] = t.split(':'), hr = h % 12 || 12;
+    return `${hr}:${m} ${h >= 12 ? 'PM' : 'AM'}`;
+  };
+
+  document.addEventListener('DOMContentLoaded', loadDashboardData);
+</script>
 </body>
 </html>

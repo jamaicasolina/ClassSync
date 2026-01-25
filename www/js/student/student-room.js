@@ -59,7 +59,6 @@ function loadRooms() {
                 roomGrid.appendChild(card);
             });
 
-            // UPDATE COUNTERS
             countAvailable.textContent = available;
             countOccupied.textContent = occupied;
             countMaintenance.textContent = maintenance;

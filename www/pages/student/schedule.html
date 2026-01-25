@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Availability | ClassSync</title>
-
-    <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
-    <link rel="stylesheet" href="../../css/room-admin.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Schedule - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
 </head>
 <body>
     <div class="dashboard-container">
@@ -25,7 +23,7 @@
                     <span class="nav-icon">📚</span>
                     <span>My Courses</span>
                 </a>
-                <a href="schedule.html" class="nav-item">
+                <a href="schedule.html" class="nav-item active">
                     <span class="nav-icon">📅</span>
                     <span>My Schedule</span>
                 </a>
@@ -36,9 +34,8 @@
                 <a href="notifications.html" class="nav-item">
                     <span class="nav-icon">🔔</span>
                     <span>Notifications</span>
-                    <span class="notification-badge" id="notifBadge">0</span>
                 </a>
-                <a href="student-room.html" class="nav-item active">
+                <a href="student-room.html" class="nav-item">
                     <span class="nav-icon">🏫</span>
                     <span>Room Availability</span>
                 </a>
@@ -55,37 +52,26 @@
 
         <main class="main-content">
             <header class="content-header">
-                <h1>Room Availability</h1>
+                <h1>My Weekly Schedule</h1>
             </header>
 
-            <div class="summary">
-                <div class="summary-card">
-                    <span>Available</span>
-                    <h3 id="countAvailable" class="available">0</h3>
+            <div class="card">
+                <div class="card-header">
+                    <h2>This Week's Classes</h2>
+                    <p>Year <span id="userYear"></span> - Section <span id="userSection"></span></p>
                 </div>
-                <div class="summary-card">
-                    <span>Occupied</span>
-                    <h3 id="countOccupied" class="occupied">0</h3>
-                </div>
-                <div class="summary-card">
-                    <span>Maintenance</span>
-                    <h3 id="countMaintenance" class="maintenance">0</h3>
+                <div class="card-body">
+                    <div id="weeklySchedule">
+                        <p class="no-data">Loading schedule...</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="room-grid" id="roomGrid">
-                Loading rooms...
-            </div>
+            <div id="message" class="hidden mt-3"></div>
         </main>
     </div>
 
     <script src="../../js/core/roles.js"></script>
-    <script src="../../js/student/student-room.js"></script>
-    <script>
-        document.getElementById('logoutBtn').addEventListener('click', e => {
-            e.preventDefault();
-            if (confirm('Are you sure you want to logout?')) logout();
-        });
-    </script>
+    <script src="../../js/student/schedules.js"></script>
 </body>
 </html>
