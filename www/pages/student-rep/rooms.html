@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Availability - ClassSync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #8B0000 0%, #600000 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #8B0000;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #8B0000;
+            text-decoration: none;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-item label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #600000;
+        }
+
+        /* Room Grid */
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid transparent;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-card.available {
+            border-left-color: #27ae60;
+        }
+
+        .room-card.occupied {
+            border-left-color: #e74c3c;
+        }
+
+        .room-card.maintenance {
+            border-left-color: #f39c12;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .room-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-occupied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-maintenance {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .room-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .detail-icon {
+            font-size: 16px;
+        }
+
+        .room-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .feature-tag {
+            background: #f0f0f0;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .room-schedule {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .schedule-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .schedule-item {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
+
+        .btn-outline:hover {
+            background: #8B0000;
+            color: white;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .color-available {
+            background: #27ae60;
+        }
+
+        .color-occupied {
+            background: #e74c3c;
+        }
+
+        .color-maintenance {
+            background: #f39c12;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-number.available {
+            color: #27ae60;
+        }
+
+        .stat-number.occupied {
+            color: #e74c3c;
+        }
+
+        .stat-number.maintenance {
+            color: #f39c12;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .schedule-table th {
+            background: #8B0000;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .schedule-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .schedule-table tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <h1>ClassSync</h1>
+                <p>Student Representative</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="window.location.href='student-rep.html'">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='attendance-input.html'">
+                    <span>✏️</span>
+                    <span>Input Attendance</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='course-schedule.html'">
+                    <span>📚</span>
+                    <span>My Courses & Schedules</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='notifications.html'">
+                    <span>🔔</span>
+                    <span>Notifications</span>
+                </li>
+                <li class="nav-item active">
+                    <span>🏢</span>
+                    <span>Room Availability</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='profile.html'">
+                    <span>👤</span>
+                    <span>Profile</span>
+                </li>
+                <li class="nav-item">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Room Availability</h2>
+                <div class="breadcrumb">
+                    <a href="student-rep.html">Dashboard</a> / Room Availability
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-number available">24</div>
+                    <div class="stat-label">Available Rooms</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number occupied">12</div>
+                    <div class="stat-label">Occupied Rooms</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number maintenance">3</div>
+                    <div class="stat-label">Under Maintenance</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" style="color: #8B0000;">39</div>
+                    <div class="stat-label">Total Rooms</div>
+                </div>
+            </div>
+
+            <!-- Filter Card -->
+            <div class="card">
+                <h3 class="card-title">Filter Rooms</h3>
+                <div class="filter-section">
+                    <div class="filter-item">
+                        <label>Building</label>
+                        <select id="buildingFilter">
+                            <option value="">All Buildings</option>
+                            <option value="main">Main Building</option>
+                            <option value="science">Science Building</option>
+                            <option value="engineering">Engineering Building</option>
+                            <option value="arts">Arts Building</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Floor</label>
+                        <select id="floorFilter">
+                            <option value="">All Floors</option>
+                            <option value="1">1st Floor</option>
+                            <option value="2">2nd Floor</option>
+                            <option value="3">3rd Floor</option>
+                            <option value="4">4th Floor</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Status</label>
+                        <select id="statusFilter" onchange="filterRooms()">
+                            <option value="">All Status</option>
+                            <option value="available">Available</option>
+                            <option value="occupied">Occupied</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Capacity</label>
+                        <select id="capacityFilter">
+                            <option value="">Any Capacity</option>
+                            <option value="20">Up to 20</option>
+                            <option value="30">Up to 30</option>
+                            <option value="40">Up to 40</option>
+                            <option value="50">50+</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Date</label>
+                        <input type="date" id="dateFilter">
+                    </div>
+                    <div class="filter-item">
+                        <label>Time</label>
+                        <input type="time" id="timeFilter">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="searchRooms()">Search Rooms</button>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color color-available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-occupied"></div>
+                    <span>Occupied</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color color-maintenance"></div>
+                    <span>Under Maintenance</span>
+                </div>
+            </div>
+
+            <!-- Room Grid -->
+            <div class="room-grid" id="roomGrid">
+                <!-- Available Rooms -->
+                <div class="room-card available" data-status="available">
+                    <div class="room-header">
+                        <div class="room-number">Room 301</div>
+                        <span class="status-badge status-available">Available</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Main Building, 3rd Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 35 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📐</span>
+                            <span>Type: Standard Classroom</span>
+                        </div>
+                    </div>
+                    <div class="room-features">
+                        <span class="feature-tag">🖥️ Projector</span>
+                        <span class="feature-tag">📝 Whiteboard</span>
+                        <span class="feature-tag">❄️ Air-con</span>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('301')">View Schedule</button>
+                        <button class="btn btn-small btn-outline">Book Room</button>
+                    </div>
+                </div>
+
+                <div class="room-card available" data-status="available">
+                    <div class="room-header">
+                        <div class="room-number">Room 205</div>
+                        <span class="status-badge status-available">Available</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Science Building, 2nd Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 28 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📐</span>
+                            <span>Type: Laboratory</span>
+                        </div>
+                    </div>
+                    <div class="room-features">
+                        <span class="feature-tag">🖥️ Computers</span>
+                        <span class="feature-tag">🔬 Lab Equipment</span>
+                        <span class="feature-tag">❄️ Air-con</span>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('205')">View Schedule</button>
+                        <button class="btn btn-small btn-outline">Book Room</button>
+                    </div>
+                </div>
+
+                <!-- Occupied Rooms -->
+                <div class="room-card occupied" data-status="occupied">
+                    <div class="room-header">
+                        <div class="room-number">Room 402</div>
+                        <span class="status-badge status-occupied">Occupied</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Main Building, 4th Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 40 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📐</span>
+                            <span>Type: Lecture Hall</span>
+                        </div>
+                    </div>
+                    <div class="room-schedule">
+                        <div class="schedule-title">Currently in use:</div>
+                        <div class="schedule-item">📚 MATH201 - Calculus II</div>
+                        <div class="schedule-item">⏰ Until 2:00 PM</div>
+                        <div class="schedule-item">👨‍🏫 Dr. Maria Garcia</div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('402')">View Schedule</button>
+                    </div>
+                </div>
+
+                <div class="room-card occupied" data-status="occupied">
+                    <div class="room-header">
+                        <div class="room-number">Room 110</div>
+                        <span class="status-badge status-occupied">Occupied</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Arts Building, 1st Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 25 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📐</span>
+                            <span>Type: Standard Classroom</span>
+                        </div>
+                    </div>
+                    <div class="room-schedule">
+                        <div class="schedule-title">Currently in use:</div>
+                        <div class="schedule-item">📚 ENG101 - English Composition</div>
+                        <div class="schedule-item">⏰ Until 3:30 PM</div>
+                        <div class="schedule-item">👨‍🏫 Prof. Emily White</div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('110')">View Schedule</button>
+                    </div>
+                </div>
+
+                <!-- Maintenance -->
+                <div class="room-card maintenance" data-status="maintenance">
+                    <div class="room-header">
+                        <div class="room-number">Room 305</div>
+                        <span class="status-badge status-maintenance">Maintenance</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Main Building, 3rd Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 32 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">🔧</span>
+                            <span>Expected: Jan 25, 12:00 PM</span>
+                        </div>
+                    </div>
+                    <div class="room-schedule">
+                        <div class="schedule-title">Maintenance Details:</div>
+                        <div class="schedule-item">🔧 Air conditioning repair</div>
+                        <div class="schedule-item">⏰ 8:00 AM - 12:00 PM</div>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('305')">View Schedule</button>
+                    </div>
+                </div>
+
+                <!-- More Available Rooms -->
+                <div class="room-card available" data-status="available">
+                    <div class="room-header">
+                        <div class="room-number">Room 201</div>
+                        <span class="status-badge status-available">Available</span>
+                    </div>
+                    <div class="room-details">
+                        <div class="detail-row">
+                            <span class="detail-icon">🏢</span>
+                            <span>Main Building, 2nd Floor</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">👥</span>
+                            <span>Capacity: 20 students</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-icon">📐</span>
+                            <span>Type: Small Classroom</span>
+                        </div>
+                    </div>
+                    <div class="room-features">
+                        <span class="feature-tag">📝 Whiteboard</span>
+                        <span class="feature-tag">❄️ Air-con</span>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn btn-small btn-primary" onclick="viewSchedule('201')">View Schedule</button>
+                        <button class="btn btn-small btn-outline">Book Room</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalRoomTitle">Room Schedule</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <table class="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Course</th>
+                            <th>Professor</th>
+                            <th>Day</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <!-- Schedule data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date
+        document.getElementById('dateFilter').valueAsDate = new Date();
+
+        function filterRooms() {
+            const status = document.getElementById('statusFilter').value;
+            const rooms = document.querySelectorAll('.room-card');
+
+            rooms.forEach(room => {
+                if (status === '' || room.dataset.status === status) {
+                    room.style.display = 'block';
+                } else {
+                    room.style.display = 'none';
+                }
+            });
+        }
+
+        function searchRooms() {
+            alert('Searching for rooms with specified criteria...');
+            // In real implementation, this would query the database
+        }
+
+        function viewSchedule(roomNumber) {
+            document.getElementById('modalRoomTitle').textContent = `Room ${roomNumber} Schedule`;
+            
+            // Sample schedule data
+            const scheduleData = {
+                '301': [
+                    { time: '7:00 AM - 8:30 AM', course: 'CS101', professor: 'Dr. Jane Smith', day: 'Mon, Wed, Fri' },
+                    { time: '10:00 AM - 11:30 AM', course: 'MATH101', professor: 'Prof. John Doe', day: 'Tue, Thu' }
+                ],
+                '205': [
+                    { time: '9:00 AM - 12:00 PM', course: 'CS102 Lab', professor: 'Prof. John Doe', day: 'Wed' },
+                    { time: '1:00 PM - 4:00 PM', course: 'CS201 Lab', professor: 'Dr. Sarah Lee', day: 'Fri' }
+                ],
+                '402': [
+                    { time: '1:00 PM - 2:00 PM', course: 'MATH201', professor: 'Dr. Maria Garcia', day: 'Mon, Wed, Fri' },
+                    { time: '3:00 PM - 5:00 PM', course: 'MATH301', professor: 'Dr. Maria Garcia', day: 'Tue, Thu' }
+                ],
+                '110': [
+                    { time: '2:00 PM - 3:30 PM', course: 'ENG101', professor: 'Prof. Emily White', day: 'Tue, Thu' },
+                    { time: '8:00 AM - 9:30 AM', course: 'ENG201', professor: 'Prof. Emily White', day: 'Mon, Wed, Fri' }
+                ],
+                '305': [
+                    { time: 'Under Maintenance', course: '-', professor: '-', day: 'Jan 25' }
+                ],
+                '201': [
+                    { time: 'Available all day', course: '-', professor: '-', day: 'Today' }
+                ]
+            };
+
+            const tbody = document.getElementById('scheduleTableBody');
+            const schedule = scheduleData[roomNumber] || [];
+
+            tbody.innerHTML = schedule.map(item => `
+                <tr>
+                    <td>${item.time}</td>
+                    <td>${item.course}</td>
+                    <td>${item.professor}</td>
+                    <td>${item.day}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('scheduleModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('scheduleModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('scheduleModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

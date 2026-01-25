@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Attendance - ClassSync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #8B0000 0%, #600000 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #8B0000;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #8B0000;
+            text-decoration: none;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #8B0000;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Attendance Table */
+        .attendance-table {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #8B0000;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .student-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .student-id {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Radio buttons */
+        .attendance-options {
+            display: flex;
+            gap: 20px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .radio-option label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .status-present {
+            color: #27ae60;
+        }
+
+        .status-absent {
+            color: #e74c3c;
+        }
+
+        .status-late {
+            color: #f39c12;
+        }
+
+        .status-excused {
+            color: #3498db;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #600000;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
+
+        .btn-outline:hover {
+            background: #8B0000;
+            color: white;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .notes-section {
+            margin-top: 20px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <h1>ClassSync</h1>
+                <p>Student Representative</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item active">
+                    <span>✏️</span>
+                    <span>Input Attendance</span>
+                </li>
+                <li class="nav-item">
+                    <span>📚</span>
+                    <span>My Courses & Schedules</span>
+                </li>
+                <li class="nav-item">
+                    <span>🔔</span>
+                    <span>Notifications</span>
+                </li>
+                <li class="nav-item">
+                    <span>🏢</span>
+                    <span>Room Availability</span>
+                </li>
+                <li class="nav-item">
+                    <span>👤</span>
+                    <span>Profile</span>
+                </li>
+                <li class="nav-item">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Input Attendance</h2>
+                <div class="breadcrumb">
+                    <a href="student-rep.html">Dashboard</a> / Input Attendance
+                </div>
+            </div>
+
+            <!-- Alert -->
+            <div class="alert alert-success" id="successAlert">
+                Attendance submitted successfully!
+            </div>
+
+            <!-- Class Selection Card -->
+            <div class="card">
+                <h3 class="card-title">Select Class Session</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Course <span class="required">*</span></label>
+                        <select id="courseSelect" required>
+                            <option value="">-- Select Course --</option>
+                            <option value="CS101">CS101 - Introduction to Programming</option>
+                            <option value="CS102">CS102 - Data Structures</option>
+                            <option value="MATH201">MATH201 - Calculus II</option>
+                            <option value="ENG101">ENG101 - English Composition</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date <span class="required">*</span></label>
+                        <input type="date" id="dateInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time <span class="required">*</span></label>
+                        <input type="time" id="timeInput" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Room <span class="required">*</span></label>
+                        <input type="text" id="roomInput" placeholder="e.g., Room 301" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Professor</label>
+                    <input type="text" id="professorInput" placeholder="Professor name" readonly value="Dr. Jane Smith">
+                </div>
+            </div>
+
+            <!-- Attendance Summary -->
+            <div class="card">
+                <h3 class="card-title">Attendance Summary</h3>
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <div class="summary-number" style="color: #27ae60;" id="presentCount">0</div>
+                        <div class="summary-label">Present</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-number" style="color: #e74c3c;" id="absentCount">0</div>
+                        <div class="summary-label">Absent</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-number" style="color: #f39c12;" id="lateCount">0</div>
+                        <div class="summary-label">Late</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-number" style="color: #3498db;" id="excusedCount">0</div>
+                        <div class="summary-label">Excused</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-number" style="color: #333;" id="totalCount">30</div>
+                        <div class="summary-label">Total Students</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Attendance List -->
+            <div class="card">
+                <h3 class="card-title">Student Attendance List</h3>
+                <div class="attendance-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Student Name</th>
+                                <th>Student ID</th>
+                                <th>Status</th>
+                                <th style="width: 200px;">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="notes-section">
+                    <div class="form-group">
+                        <label>Additional Notes</label>
+                        <textarea id="notesInput" placeholder="Add any additional notes about this class session..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="submitAttendance()">Submit Attendance</button>
+                    <button class="btn btn-secondary" onclick="saveDraft()">Save as Draft</button>
+                    <button class="btn btn-outline" onclick="resetForm()">Clear All</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sample student data
+        const students = [
+            { id: 1, name: "Alice Johnson", studentId: "2021-00001" },
+            { id: 2, name: "Bob Smith", studentId: "2021-00002" },
+            { id: 3, name: "Charlie Brown", studentId: "2021-00003" },
+            { id: 4, name: "Diana Prince", studentId: "2021-00004" },
+            { id: 5, name: "Edward Norton", studentId: "2021-00005" },
+            { id: 6, name: "Fiona Apple", studentId: "2021-00006" },
+            { id: 7, name: "George Martin", studentId: "2021-00007" },
+            { id: 8, name: "Hannah Baker", studentId: "2021-00008" },
+            { id: 9, name: "Ian Malcolm", studentId: "2021-00009" },
+            { id: 10, name: "Julia Roberts", studentId: "2021-00010" },
+            { id: 11, name: "Kevin Hart", studentId: "2021-00011" },
+            { id: 12, name: "Laura Palmer", studentId: "2021-00012" },
+            { id: 13, name: "Michael Scott", studentId: "2021-00013" },
+            { id: 14, name: "Nancy Drew", studentId: "2021-00014" },
+            { id: 15, name: "Oscar Isaac", studentId: "2021-00015" },
+            { id: 16, name: "Paula Abdul", studentId: "2021-00016" },
+            { id: 17, name: "Quincy Jones", studentId: "2021-00017" },
+            { id: 18, name: "Rachel Green", studentId: "2021-00018" },
+            { id: 19, name: "Steven Tyler", studentId: "2021-00019" },
+            { id: 20, name: "Tina Fey", studentId: "2021-00020" },
+            { id: 21, name: "Uma Thurman", studentId: "2021-00021" },
+            { id: 22, name: "Victor Hugo", studentId: "2021-00022" },
+            { id: 23, name: "Wendy Williams", studentId: "2021-00023" },
+            { id: 24, name: "Xavier Woods", studentId: "2021-00024" },
+            { id: 25, name: "Yolanda Adams", studentId: "2021-00025" },
+            { id: 26, name: "Zachary Quinto", studentId: "2021-00026" },
+            { id: 27, name: "Amanda Seyfried", studentId: "2021-00027" },
+            { id: 28, name: "Brandon Lee", studentId: "2021-00028" },
+            { id: 29, name: "Catherine Zeta", studentId: "2021-00029" },
+            { id: 30, name: "David Beckham", studentId: "2021-00030" }
+        ];
+
+        // Set today's date
+        document.getElementById('dateInput').valueAsDate = new Date();
+
+        // Load students
+        function loadStudents() {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = students.map((student, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-id">${student.studentId}</div>
+                    </td>
+                    <td>${student.studentId}</td>
+                    <td>
+                        <div class="attendance-options">
+                            <div class="radio-option">
+                                <input type="radio" id="present-${student.id}" name="status-${student.id}" value="present" onchange="updateSummary()">
+                                <label for="present-${student.id}" class="status-present">Present</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="absent-${student.id}" name="status-${student.id}" value="absent" onchange="updateSummary()">
+                                <label for="absent-${student.id}" class="status-absent">Absent</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="late-${student.id}" name="status-${student.id}" value="late" onchange="updateSummary()">
+                                <label for="late-${student.id}" class="status-late">Late</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="excused-${student.id}" name="status-${student.id}" value="excused" onchange="updateSummary()">
+                                <label for="excused-${student.id}" class="status-excused">Excused</label>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="Optional" style="padding: 8px; font-size: 13px;">
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update summary counts
+        function updateSummary() {
+            let present = 0, absent = 0, late = 0, excused = 0;
+            
+            students.forEach(student => {
+                const selected = document.querySelector(`input[name="status-${student.id}"]:checked`);
+                if (selected) {
+                    switch(selected.value) {
+                        case 'present': present++; break;
+                        case 'absent': absent++; break;
+                        case 'late': late++; break;
+                        case 'excused': excused++; break;
+                    }
+                }
+            });
+
+            document.getElementById('presentCount').textContent = present;
+            document.getElementById('absentCount').textContent = absent;
+            document.getElementById('lateCount').textContent = late;
+            document.getElementById('excusedCount').textContent = excused;
+        }
+
+        // Submit attendance
+        function submitAttendance() {
+            const course = document.getElementById('courseSelect').value;
+            const date = document.getElementById('dateInput').value;
+            const time = document.getElementById('timeInput').value;
+            const room = document.getElementById('roomInput').value;
+
+            if (!course || !date || !time || !room) {
+                alert('Please fill in all required fields!');
+                return;
+            }
+
+            // Show success alert
+            const alert = document.getElementById('successAlert');
+            alert.classList.add('show');
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+
+            console.log('Attendance submitted successfully!');
+            // Here you would typically send data to backend
+        }
+
+        // Save draft
+        function saveDraft() {
+            alert('Attendance saved as draft!');
+        }
+
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to clear all attendance data?')) {
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                document.querySelectorAll('input[type="text"]').forEach(input => {
+                    if (!input.readOnly) input.value = '';
+                });
+                document.getElementById('notesInput').value = '';
+                updateSummary();
+            }
+        }
+
+        // Initialize
+        loadStudents();
+    </script>
+</body>
+</html>

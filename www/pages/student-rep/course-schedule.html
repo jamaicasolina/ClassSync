@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Courses & Schedules - ClassSync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #8B0000 0%, #600000 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-section {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-section h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #8B0000;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #8B0000;
+            text-decoration: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #8B0000;
+            border-bottom-color: #8B0000;
+            font-weight: 600;
+        }
+
+        .tab:hover {
+            color: #8B0000;
+        }
+
+        /* Card */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Course Card */
+        .course-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #8B0000;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .course-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .course-code {
+            color: #8B0000;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .course-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .detail-icon {
+            font-size: 18px;
+        }
+
+        /* Schedule Grid */
+        .schedule-grid {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #8B0000;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            vertical-align: top;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .time-cell {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+
+        .class-block {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .class-block:hover {
+            transform: scale(1.02);
+        }
+
+        .class-name {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .class-room {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        /* Filter */
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-item label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .filter-item select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #8B0000;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Button */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #600000;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
+
+        .btn-outline:hover {
+            background: #8B0000;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <h1>ClassSync</h1>
+                <p>Student Representative</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="window.location.href='student-rep.html'">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='attendance-input.html'">
+                    <span>✏️</span>
+                    <span>Input Attendance</span>
+                </li>
+                <li class="nav-item active">
+                    <span>📚</span>
+                    <span>My Courses & Schedules</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='notifications.html'">
+                    <span>🔔</span>
+                    <span>Notifications</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='room-availability.html'">
+                    <span>🏢</span>
+                    <span>Room Availability</span>
+                </li>
+                <li class="nav-item" onclick="window.location.href='profile.html'">
+                    <span>👤</span>
+                    <span>Profile</span>
+                </li>
+                <li class="nav-item">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h2>My Courses & Schedules</h2>
+                <div class="breadcrumb">
+                    <a href="student-rep.html">Dashboard</a> / Courses & Schedules
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Total Courses</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">18</div>
+                    <div class="stat-label">Total Units</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">Classes/Week</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">3.8</div>
+                    <div class="stat-label">GPA</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('courses')">My Courses</button>
+                <button class="tab" onclick="switchTab('schedule')">Weekly Schedule</button>
+            </div>
+
+            <!-- Courses Tab -->
+            <div id="coursesTab" class="tab-content active">
+                <!-- Filter -->
+                <div class="card">
+                    <div class="filter-section">
+                        <div class="filter-item">
+                            <label>Semester</label>
+                            <select id="semesterFilter">
+                                <option value="current">Current Semester</option>
+                                <option value="2024-1">Semester 1, 2024</option>
+                                <option value="2023-2">Semester 2, 2023</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>Status</label>
+                            <select id="statusFilter">
+                                <option value="all">All Courses</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Cards -->
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">Introduction to Programming</div>
+                            <div class="course-code">CS101</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Dr. Jane Smith</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Mon, Wed, Fri 9:00 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 301</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>3 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>30 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>92% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">Data Structures and Algorithms</div>
+                            <div class="course-code">CS102</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Prof. John Doe</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Tue, Thu 10:30 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 205</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>3 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>28 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>88% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">Calculus II</div>
+                            <div class="course-code">MATH201</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Dr. Maria Garcia</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Mon, Wed, Fri 1:00 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 402</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>4 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>35 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>95% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">English Composition</div>
+                            <div class="course-code">ENG101</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Prof. Emily White</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Tue, Thu 2:00 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 110</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>3 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>25 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>90% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">Physics I</div>
+                            <div class="course-code">PHYS101</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Dr. Robert Chen</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Mon, Wed 3:00 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 305</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>3 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>32 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>87% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div>
+                            <div class="course-title">Introduction to Philosophy</div>
+                            <div class="course-code">PHIL101</div>
+                        </div>
+                        <span class="course-badge badge-active">Active</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👨‍🏫</span>
+                            <span>Prof. Sarah Johnson</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Fri 9:00 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏢</span>
+                            <span>Room 201</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📊</span>
+                            <span>2 Units</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span>20 Students</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">✅</span>
+                            <span>93% Attendance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Tab -->
+            <div id="scheduleTab" class="tab-content">
+                <div class="card">
+                    <div class="schedule-grid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px;">Time</th>
+                                    <th>Monday</th>
+                                    <th>Tuesday</th>
+                                    <th>Wednesday</th>
+                                    <th>Thursday</th>
+                                    <th>Friday</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="time-cell">7:00 AM</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">8:00 AM</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">9:00 AM</td>
+                                    <td>
+                                        <div class="class-block">
+                                            <div class="class-name">CS101</div>
+                                            <div class="class-room">Room 301</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block">
+                                            <div class="class-name">CS101</div>
+                                            <div class="class-room">Room 301</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block">
+                                            <div class="class-name">CS101</div>
+                                            <div class="class-room">Room 301</div>
+                                        </div>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                            <div class="class-name">PHIL101</div>
+                                            <div class="class-room">Room 201</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">10:00 AM</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                            <div class="class-name">CS102</div>
+                                            <div class="class-room">Room 205</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                            <div class="class-name">CS102</div>
+                                            <div class="class-room">Room 205</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">11:00 AM</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">12:00 PM</td>
+                                    <td colspan="5" style="background: #fff3cd; text-align: center; font-weight: 600;">LUNCH BREAK</td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">1:00 PM</td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                            <div class="class-name">MATH201</div>
+                                            <div class="class-room">Room 402</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                            <div class="class-name">MATH201</div>
+                                            <div class="class-room">Room 402</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                            <div class="class-name">MATH201</div>
+                                            <div class="class-room">Room 402</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">2:00 PM</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                                            <div class="class-name">ENG101</div>
+                                            <div class="class-room">Room 110</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                                            <div class="class-name">ENG101</div>
+                                            <div class="class-room">Room 110</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">3:00 PM</td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                                            <div class="class-name">PHYS101</div>
+                                            <div class="class-room">Room 305</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <div class="class-block" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                                            <div class="class-name">PHYS101</div>
+                                            <div class="class-room">Room 305</div>
+                                        </div>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">4:00 PM</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class="time-cell">5:00 PM</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected tab
+            if (tab === 'courses') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('coursesTab').classList.add('active');
+            } else if (tab === 'schedule') {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('scheduleTab').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
