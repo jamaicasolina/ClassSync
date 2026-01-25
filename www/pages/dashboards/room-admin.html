@@ -10,7 +10,6 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>ClassSync</h2>
@@ -41,14 +40,12 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="content-header">
                 <h1>Welcome, <span id="adminName">Room Admin</span></h1>
             </header>
 
             <div class="dashboard-grid">
-                <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">🏫</div>
@@ -80,7 +77,6 @@
                     </div>
                 </div>
 
-                <!-- Room Usage Overview -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Current Room Usage</h2>
@@ -91,7 +87,6 @@
                     </div>
                 </div>
 
-                <!-- Notifications -->
                 <div class="card">
                     <div class="card-header">
                         <h2>Notifications</h2>
@@ -127,9 +122,6 @@ const USAGE_API =
 
 async function loadDashboardData() {
     try {
-        /* =========================
-           ROOM STATS
-        ========================= */
         const roomsRes = await fetch(ROOMS_API);
         const rooms = await roomsRes.json();
 
@@ -146,9 +138,6 @@ async function loadDashboardData() {
         document.getElementById('availableRooms').textContent = available;
         document.getElementById('maintenanceRooms').textContent = maintenance;
 
-        /* =========================
-           CURRENT ROOM USAGE
-        ========================= */
         const usageRes = await fetch(USAGE_API);
         const usage = await usageRes.json();
 

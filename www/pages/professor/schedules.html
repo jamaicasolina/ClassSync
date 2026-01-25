@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Schedules - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <style>
+        .day-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .day-checkbox-label {
+            min-width: 120px;
+            font-weight: 500;
+        }
+        .time-inputs-inline {
+            display: none;
+            gap: 10px;
+            align-items: center;
+        }
+        .time-inputs-inline.active {
+            display: flex;
+        }
+        .time-inputs-inline label {
+            margin: 0;
+            font-size: 0.9em;
+        }
+        .time-inputs-inline input {
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Professor</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboards/professor.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="courses.html" class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>Courses</span>
+                </a>
+                <a href="schedules.html" class="nav-item active">
+                    <span class="nav-icon">📅</span>
+                    <span>Schedules</span>
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <span class="nav-icon">✓</span>
+                    <span>Attendance</span>
+                </a>
+                <a href="notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span>
+                    <span>Notifications</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span>
+                    <span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>My Schedules</h1>
+                <button class="btn btn-primary" id="openCreateScheduleModal">+ Create Schedule</button>
+            </header>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Weekly Schedule</h2>
+                </div>
+                <div class="card-body">
+                    <div id="weeklySchedule">
+                        <p class="no-data">Loading schedules...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scheduleModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto;">
+                <div class="card" style="width: 700px; max-width: 90%; margin: 20px;">
+                    <div class="card-header">
+                        <h2 id="scheduleModalTitle">Create Schedule</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="scheduleForm">
+                            <input type="hidden" id="scheduleId">
+
+                            <div class="form-group">
+                                <label for="scheduleCourse">Course *</label>
+                                <select id="scheduleCourse" required>
+                                    <option value="">Select Course</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="scheduleRoom">Room (Optional)</label>
+                                <select id="scheduleRoom">
+                                    <option value="">No Room Assigned</option>
+                                </select>
+                                <small style="color: #666;">Leave empty if room is not yet assigned</small>
+                            </div>
+
+\                            <div class="form-group">
+                                <label>Select Days and Times *</label>
+                                
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="monday" class="day-checkbox" data-day="monday">
+                                        Monday
+                                    </label>
+                                    <div class="time-inputs-inline" id="monday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="monday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="monday">
+                                    </div>
+                                </div>
+
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="tuesday" class="day-checkbox" data-day="tuesday">
+                                        Tuesday
+                                    </label>
+                                    <div class="time-inputs-inline" id="tuesday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="tuesday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="tuesday">
+                                    </div>
+                                </div>
+
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="wednesday" class="day-checkbox" data-day="wednesday">
+                                        Wednesday
+                                    </label>
+                                    <div class="time-inputs-inline" id="wednesday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="wednesday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="wednesday">
+                                    </div>
+                                </div>
+
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="thursday" class="day-checkbox" data-day="thursday">
+                                        Thursday
+                                    </label>
+                                    <div class="time-inputs-inline" id="thursday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="thursday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="thursday">
+                                    </div>
+                                </div>
+
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="friday" class="day-checkbox" data-day="friday">
+                                        Friday
+                                    </label>
+                                    <div class="time-inputs-inline" id="friday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="friday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="friday">
+                                    </div>
+                                </div>
+
+                                <div class="day-row">
+                                    <label class="day-checkbox-label">
+                                        <input type="checkbox" value="saturday" class="day-checkbox" data-day="saturday">
+                                        Saturday
+                                    </label>
+                                    <div class="time-inputs-inline" id="saturday-times">
+                                        <label>Start:</label>
+                                        <input type="time" class="day-start-time" data-day="saturday">
+                                        <label>End:</label>
+                                        <input type="time" class="day-end-time" data-day="saturday">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group hidden" id="reasonGroup">
+                                <label for="scheduleReason">Reason for Change *</label>
+                                <textarea id="scheduleReason" rows="3" placeholder="e.g., Faculty meeting, Room conflict"></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary">Save Schedule</button>
+                                <button type="button" class="btn btn-secondary" id="closeScheduleModal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="message" class="hidden mt-3"></div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script src="../../js/professor/schedules.js"></script>
+</body>
+</html>

@@ -31,15 +31,12 @@ class User {
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitize
         $this->id = htmlspecialchars(strip_tags($this->id));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->role = htmlspecialchars(strip_tags($this->role));
 
-        // HASH PASSWORD
         $hashedPassword = password_hash($this->password, PASSWORD_DEFAULT);
 
-        // Bind
         $stmt->bindParam(":id", $this->id);
         $stmt->bindParam(":firstName", $this->firstName);
         $stmt->bindParam(":middleName", $this->middleName);

@@ -2,31 +2,41 @@
 
 class Schedule {
     private PDO $conn;
-    private string $table = 'schedules';
+    private string $table = "schedules";
 
     public function __construct(PDO $db) {
         $this->conn = $db;
     }
 
     public function create($course_id, $room_id, $day, $start, $end) {
-        return $this->save(
-            compact('course_id', 'room_id', 'day', 'start', 'end'),
+        $room_id = $this->normalizeRoom($room_id);
+        $day = strtolower($day);
+
+        if ($room_id && $this->hasConflict($room_id, $day, $start, $end)) return false;
+
+        return $this->execute(
             "INSERT INTO {$this->table}
              (course_id, room_id, day_of_week, start_time, end_time)
-             VALUES (:course_id, :room_id, :day, :start, :end)"
+             VALUES (:course_id, :room_id, :day, :start, :end)",
+            compact('course_id', 'room_id', 'day', 'start', 'end')
         );
     }
 
     public function update($id, $room_id, $day, $start, $end, $reason, $changed_by) {
-        if (!$old = $this->getById($id)) return false;
+        $room_id = $this->normalizeRoom($room_id);
+        $day = strtolower($day);
 
-        if (!$this->save(
-            compact('id', 'room_id', 'day', 'start', 'end'),
+        $old = $this->getById($id);
+        if (!$old) return false;
+
+        if ($room_id && $this->hasConflict($room_id, $day, $start, $end, $id)) return false;
+
+        if (!$this->execute(
             "UPDATE {$this->table}
              SET room_id = :room_id, day_of_week = :day,
                  start_time = :start, end_time = :end
              WHERE id = :id",
-            $id
+            compact('id', 'room_id', 'day', 'start', 'end')
         )) return false;
 
         return $this->logChange(
@@ -38,12 +48,14 @@ class Schedule {
     }
 
     public function cancel($id, $reason, $changed_by) {
-        return $this->execute(
+        if (!$this->execute(
             "UPDATE {$this->table}
              SET is_cancelled = 1, cancellation_reason = :reason
              WHERE id = :id",
             compact('id', 'reason')
-        ) && $this->logChange($id, null, null, null, null, $reason, $changed_by);
+        )) return false;
+
+        return $this->logChange($id, null, null, null, null, $reason, $changed_by);
     }
 
     public function uncancel($id) {
@@ -74,9 +86,8 @@ class Schedule {
 
         if ($exclude_id) $sql .= " AND id != :exclude_id";
 
-        return $this->query($sql, compact(
-            'room_id', 'day', 'start', 'end', 'exclude_id'
-        ))->rowCount() > 0;
+        $params = compact('room_id', 'day', 'start', 'end', 'exclude_id');
+        return $this->query($sql, $params)->rowCount() > 0;
     }
 
     public function getById($id) {
@@ -157,26 +168,15 @@ class Schedule {
         );
     }
 
-    private function save(array $data, string $sql, $exclude_id = null) {
-        $data['room_id'] = empty($data['room_id']) ? null : $data['room_id'];
-        $data['day'] = strtolower($data['day']);
-
-        if ($data['room_id'] &&
-            $this->hasConflict(
-                $data['room_id'], $data['day'], $data['start'], $data['end'], $exclude_id
-            )
-        ) return false;
-
-        return $this->execute($sql, $data);
+    private function normalizeRoom($room_id) {
+        return empty($room_id) ? null : $room_id;
     }
 
     private function orderedQuery($sql, array $params) {
-        return $this->query(
-            $sql . " ORDER BY FIELD(day_of_week,
-                'monday','tuesday','wednesday','thursday','friday','saturday'),
-                start_time",
-            $params
-        );
+        $sql .= " ORDER BY FIELD(day_of_week,
+                    'monday','tuesday','wednesday','thursday','friday','saturday'),
+                    start_time";
+        return $this->query($sql, $params);
     }
 
     private function logChange($id, $old_s, $old_e, $new_s, $new_e, $reason, $by) {

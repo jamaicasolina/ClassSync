@@ -14,9 +14,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? null;
 $data = json_decode(file_get_contents("php://input"), true);
 
-/* =====================================
-   GET: CURRENT ROOM USAGE (Dashboard)
-===================================== */
 $action = $_GET['action'] ?? null;
 
 if ($method === 'GET' && $action === 'student-availability') {
@@ -55,19 +52,12 @@ if ($method === 'GET' && $action === 'student-availability') {
     exit;
 }
 
-
-/* =====================================
-   GET: ALL ROOMS
-===================================== */
 if ($method === 'GET') {
     $stmt = $room->getAllWithCurrentSchedule();
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
     exit;
 }
 
-/* =====================================
-   PUT: UPDATE ROOM STATUS
-===================================== */
 if ($method === 'PUT') {
     if (!isset($data['id'], $data['status'])) {
         http_response_code(400);
@@ -80,9 +70,6 @@ if ($method === 'PUT') {
     exit;
 }
 
-/* =====================================
-   POST: CREATE ROOM
-===================================== */
 if ($method === 'POST') {
     if (!isset($data['room_number'], $data['building'], $data['capacity'])) {
         http_response_code(400);
@@ -100,9 +87,6 @@ if ($method === 'POST') {
     exit;
 }
 
-/* =====================================
-   PATCH: UPDATE ROOM
-===================================== */
 if ($method === 'PATCH') {
     if (!isset($data['id'], $data['room_number'], $data['building'], $data['capacity'])) {
         http_response_code(400);
@@ -121,9 +105,6 @@ if ($method === 'PATCH') {
     exit;
 }
 
-/* =====================================
-   DELETE: REMOVE ROOM
-===================================== */
 if ($method === 'DELETE') {
     if (!isset($data['id'])) {
         http_response_code(400);
@@ -136,8 +117,5 @@ if ($method === 'DELETE') {
     exit;
 }
 
-/* =====================================
-   METHOD NOT ALLOWED
-===================================== */
 http_response_code(405);
 echo json_encode(["message" => "Method not allowed"]);

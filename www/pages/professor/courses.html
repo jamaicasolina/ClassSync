@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Courses - ClassSync</title>
+    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="../../css/dashboard.css" />
+    <style>
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal > .card {
+            max-width: 90%; max-height: 90vh; overflow-y: auto;
+            width: 600px;
+        }
+        #enrollmentModal > .card {
+            width: 800px;
+            z-index: 1000;
+        }
+        #addStudentsModal {
+            z-index: 1001;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ClassSync</h2>
+                <p class="user-role">Professor</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../dashboards/professor.html" class="nav-item">
+                    <span class="nav-icon">📊</span><span>Dashboard</span>
+                </a>
+                <a href="courses.html" class="nav-item active">
+                    <span class="nav-icon">📚</span><span>Courses</span>
+                </a>
+                <a href="schedules.html" class="nav-item">
+                    <span class="nav-icon">📅</span><span>Schedules</span>
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <span class="nav-icon">✓</span><span>Attendance</span>
+                </a>
+                <a href="notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span><span>Notifications</span>
+                </a>
+                <a href="../profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span><span>Profile</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span><span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>My Courses</h1>
+                <button class="btn btn-primary" id="openCreateModal">+ Create Course</button>
+            </header>
+
+            <!-- Course List -->
+            <div class="card">
+                <div class="card-header"><h2>Course List</h2></div>
+                <div class="card-body">
+                    <div id="coursesList">
+                        <p class="no-data">Loading courses...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create/Edit Course Modal -->
+            <div id="courseModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                <div class="card" style="width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                    <div class="card-header"><h2 id="modalTitle">Create Course</h2></div>
+                    <div class="card-body">
+                        <form id="courseForm">
+                            <input type="hidden" id="courseId" />
+
+                            <div class="form-group">
+                                <label for="courseCode">Course Code *</label>
+                                <input type="text" id="courseCode" required placeholder="e.g., IT101" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="courseName">Course Title *</label>
+                                <input type="text" id="courseName" required placeholder="e.g., Introduction to IT" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="courseDescription">Description</label>
+                                <textarea id="courseDescription" rows="3" placeholder="Course description"></textarea>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="courseYear">Year Level *</label>
+                                    <select id="courseYear" required>
+                                        <option value="">Select Year</option>
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3">3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="courseSection">Section *</label>
+                                    <input type="text" id="courseSection" required placeholder="e.g., 1, 2, 1P" />
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary">Save Course</button>
+                                <button type="button" class="btn btn-secondary" id="closeModal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enrollment Modal -->
+            <div id="enrollmentModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                <div class="card" style="width: 800px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                    <div class="card-header">
+                        <h2>Enrolled Students - <span id="enrolledCourseTitle"></span></h2>
+                        <button class="btn btn-primary" id="openAddStudentsBtn">+ Add Students</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="enrolledStudentsList">
+                            <p class="no-data">Loading students...</p>
+                        </div>
+                        <button class="btn btn-secondary mt-3" id="closeEnrollmentModal">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Students Modal -->
+            <div id="addStudentsModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1001;">
+                <div class="card" style="width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                    <div class="card-header"><h2>Add Students to Course</h2></div>
+                    <div class="card-body">
+                        <div id="availableStudentsList">
+                            <p class="no-data">Loading students...</p>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-primary" id="enrollStudentsBtn">Enroll Selected</button>
+                            <button class="btn btn-secondary" id="closeAddStudentsModal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="message" class="hidden mt-3"></div>
+        </main>
+    </div>
+
+    <script src="../../js/core/roles.js"></script>
+    <script src="../../js/professor/courses.js"></script>
+</body>
+</html>
